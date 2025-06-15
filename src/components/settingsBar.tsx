@@ -1,5 +1,5 @@
 import React from 'react';
 
 export const SettingsBar = () => {
-  return <aside>settingsBar</aside>;
+  return <aside className="overflow-y-auto center-col">settingsBar</aside>;
 };
