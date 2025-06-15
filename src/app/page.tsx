@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
-import { LoadingSpinner } from '@/component';
+import { LoadingSpinner, Button } from '@/components';
 import { MessageSquareDot } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -25,7 +25,7 @@ export default function Home() {
 
   const errorStyles = 'text-red500 text-sm';
   return (
-    <div className="font-lato center-col gap-2 h-screen text-primary ">
+    <div className="font-lato center-col gap-5 h-screen text-primary ">
       {' '}
       <div className="flex gap-2 items-center font-bold text-2xl">
         {' '}
@@ -34,9 +34,10 @@ export default function Home() {
       </div>
       <div>
         {/* google sign button */}
-        <button
-          type="button"
-          className="self-center  border border-primary center rounded py-3 px-5 hover:shdow cursor-pointer gap-10 w-full"
+        <Button
+          className="self-center  border border-primary center  py-5 px-5  cursor-pointer gap-10 w-full"
+          variant={'outline'}
+          size={'lg'}
           onClick={() => handleGoogleSignIn()}
         >
           {' '}
@@ -52,10 +53,10 @@ export default function Home() {
                 height={24}
                 className="h-auto w-auto"
               />
-              <p className="text-primary font-medium max-md:text-sm">Sign in with Google</p>
+              <p className="text-primary font-medium max-md:text-sm text-xl">Sign in with Google</p>
             </div>
           )}
-        </button>
+        </Button>
         {/* Display  errors */}
         {authError && <p className={errorStyles + ' text-center'}>{authError}</p>}
       </div>
