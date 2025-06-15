@@ -15,7 +15,7 @@ export default function Home() {
     setIsGoogleLoading(true);
 
     try {
-      navigate.push('/');
+      navigate.push('/chat');
     } catch (error: any) {
       setAuthError(error.message);
     } finally {
