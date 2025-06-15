@@ -17,7 +17,7 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: 'nextchat',
+  title: 'Nextchat',
   description: 'Best chat app built with Next.js, TypeScript, and Tailwind CSS',
 };
 
