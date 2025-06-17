@@ -7,8 +7,10 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import gsap from 'gsap';
 import Link from 'next/link';
+
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
+
   //
   useEffect(() => {
     gsap.fromTo(
@@ -16,11 +18,15 @@ export const Sidebar = () => {
       { opacity: 0 },
       { opacity: 1, duration: 0.5, ease: 'power2.inOut' }
     );
-  }, [activeItem]);
+  }, [activeItem,]);
+
+  // Fallback avatar if userData or avatar_url is missing
+  const avatarUrl = '/images/google.svg'; // Add a default image in public folder
+
   return (
     <div className="flex h-screen">
       {/* Primary Sidebar */}
-      <aside className=" h-screen w-20  border-r border-r-primary bg-background px-2 py-5 flex flex-col justify-between items-center">
+      <aside className=" h-screen w-20  border-r border-r-primary bg-background px-2 py-5 flex flex-col  items-center gap-10">
         <div className="flex flex-col items-center gap-5">
           {' '}
           <Link href="/chat">
@@ -45,13 +51,12 @@ export const Sidebar = () => {
           ))}
         </div>
         <div>
-          {' '}
           <Image
-            src="/images/google.svg"
-            alt="google logo"
+            src={avatarUrl}
+            alt={avatarUrl}
             width={24}
             height={24}
-            className="h-auto w-auto"
+            className="h-auto w-auto rounded-full"
           />
         </div>
       </aside>

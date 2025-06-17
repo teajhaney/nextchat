@@ -14,9 +14,11 @@ export async function GET(request: Request) {
   if (code) {
     try {
       const supabase = await supabaseServer();
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
+		const {  error } = await supabase.auth.exchangeCodeForSession(code);
+	
       if (error) throw error;
       return NextResponse.redirect(`${origin}/chat`);
+    
     } catch (error) {
       console.error('Code Exchange Error:', error);
       return NextResponse.redirect(`${origin}/?error=code_exchange_failed`);

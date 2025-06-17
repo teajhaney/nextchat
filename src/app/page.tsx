@@ -4,11 +4,23 @@ import { supabaseBrowser } from '@/lib/supabase/browser';
 import { MessageSquareDot } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+// import { useAuthStore } from './store/authStore';
+// import { useRouter } from 'next/navigation';
+
 
 export default function Home() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-
   const [authError, setAuthError] = useState<string | null>(null);
+	// const { user } = useAuthStore();
+	
+
+//   const navigate = useRouter();
+//   // Redirect to /chat if already signed in
+//   useEffect(() => {
+//     if (user) {
+//       navigate.push('/chat');
+//     }
+//   }, [user, navigate]);
 
   //google
   const handleGoogleSignIn = async () => {

@@ -7,3 +7,5 @@ export { SettingsBar } from './settingsBar';
 export { Button } from './ui/button';
 export { Toaster } from './ui/sonner';
 export { toast } from 'sonner';
+
+//auth provider
