@@ -10,28 +10,18 @@ import { googleSignin } from '@/lib/actions/supabase.actions';
 // import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { authError, setLoading, loading, setAuthError,  } = useAuthStore(state => state);
-  // const { user } = useAuthStore();
-
-  //   const navigate = useRouter();
-  //   // Redirect to /chat if already signed in
-  //   useEffect(() => {
-  //     if (user) {
-  //       navigate.push('/chat');
-  //     }
-  //   }, [user, navigate]);
+  const { authError, setGoogleLoading, googleLoading, setAuthError } = useAuthStore(state => state);
 
   //google
   const handleGoogleSignIn = async () => {
     try {
-      setLoading(true);
+      setGoogleLoading(true);
       setAuthError(null);
       await googleSignin();
-     
     } catch (err: any) {
       setAuthError(err.message);
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   };
 
@@ -53,7 +43,7 @@ export default function Home() {
           onClick={() => handleGoogleSignIn()}
         >
           {' '}
-          {loading ? (
+          {googleLoading ? (
             <LoadingSpinner className="border-primary h-6 w-6 border-dashed border-2" />
           ) : (
             <div className="center gap-10">

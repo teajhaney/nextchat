@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Lato } from 'next/font/google';
 import './globals.css';
-import {  Toaster } from '@/components';
+import { AuthProvider, Toaster } from '@/components';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${lato.variable} antialiased`}>
-   {children}
+        <AuthProvider>{children}</AuthProvider>
         <Toaster
           position="top-center"
           theme="system"
