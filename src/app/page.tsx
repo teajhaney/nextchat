@@ -1,25 +1,35 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { LoadingSpinner, Button } from '@/components';
 import { MessageSquareDot } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+
 export default function Home() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const navigate = useRouter();
+  //   const navigate = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
 
   //google
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
+    setAuthError(null);
+    const { supabase } = await import('@/supabase/supabase');
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
 
-    try {
-      navigate.push('/chat');
-    } catch (error: any) {
+    if (error) {
       setAuthError(error.message);
-    } finally {
       setIsGoogleLoading(false);
+      return;
     }
   };
 
@@ -35,7 +45,7 @@ export default function Home() {
       <div>
         {/* google sign button */}
         <Button
-          className="self-center  border border-primary center  py-5 px-5  cursor-pointer gap-10 w-full"
+          className="self-center  border border-primary center  py-5 px-5  cursor-pointer gap-10 w-82"
           variant={'outline'}
           size={'lg'}
           onClick={() => handleGoogleSignIn()}
