@@ -1,0 +1,19 @@
+import { User } from '@/lib/supabase/supabase';
+
+export declare interface AuthState {
+  user: User | null;
+  loading: boolean;
+  userData: UserData | null;
+  authError: string | null;
+  setUser: (user: User | null) => void;
+  setUserData: (userData: UserData | null) => void;
+  setLoading: (loading: boolean) => void;
+  setAuthError: (error: string | null) => void;
+}
+
+export declare interface UserData {
+  id: string;
+  full_name: string;
+  email: string;
+  avatar_url?: string;
+}

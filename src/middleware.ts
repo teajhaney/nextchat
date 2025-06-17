@@ -43,6 +43,7 @@ async function updateSession(request: NextRequest) {
     url.search = '?error=please_sign_in';
     return NextResponse.redirect(url);
   }
+  
 
   return supabaseResponse;
 }

@@ -1,49 +1,37 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { LoadingSpinner, Button } from '@/components';
-import { supabaseBrowser } from '@/lib/supabase/browser';
 import { MessageSquareDot } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useAuthStore } from './store/authStore';
+import { googleSignin } from '@/lib/actions/supabase.actions';
+
 // import { useAuthStore } from './store/authStore';
 // import { useRouter } from 'next/navigation';
 
-
 export default function Home() {
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [authError, setAuthError] = useState<string | null>(null);
-	// const { user } = useAuthStore();
-	
+  const { authError, setLoading, loading, setAuthError,  } = useAuthStore(state => state);
+  // const { user } = useAuthStore();
 
-//   const navigate = useRouter();
-//   // Redirect to /chat if already signed in
-//   useEffect(() => {
-//     if (user) {
-//       navigate.push('/chat');
-//     }
-//   }, [user, navigate]);
+  //   const navigate = useRouter();
+  //   // Redirect to /chat if already signed in
+  //   useEffect(() => {
+  //     if (user) {
+  //       navigate.push('/chat');
+  //     }
+  //   }, [user, navigate]);
 
   //google
   const handleGoogleSignIn = async () => {
-    const supabase = supabaseBrowser();
-
-    const redirectTo = `${window.location.origin}/auth/callback`;
-
-    setIsGoogleLoading(true);
-    setAuthError(null);
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo,
-      },
-    });
-
-    if (error) {
-      setAuthError(error.message);
-      setIsGoogleLoading(false);
-    }
-    if (data.url) {
-      window.location.href = data.url; // Browser redirect for OAuth
+    try {
+      setLoading(true);
+      setAuthError(null);
+      await googleSignin();
+     
+    } catch (err: any) {
+      setAuthError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,7 +53,7 @@ export default function Home() {
           onClick={() => handleGoogleSignIn()}
         >
           {' '}
-          {isGoogleLoading ? (
+          {loading ? (
             <LoadingSpinner className="border-primary h-6 w-6 border-dashed border-2" />
           ) : (
             <div className="center gap-10">

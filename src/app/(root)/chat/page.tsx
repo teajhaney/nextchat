@@ -1,9 +1,7 @@
-import React from 'react'
+'use client';
 
 const Chat = () => {
-  return (
-	<div>Chat</div>
-  )
-}
+  return <div>chat</div>;
+};
 
-export default Chat
+export default Chat;
