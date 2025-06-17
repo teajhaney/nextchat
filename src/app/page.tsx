@@ -1,21 +1,19 @@
 'use client';
 import { LoadingSpinner, Button } from '@/components';
-import { supabaseBrowser } from '@/supabase/browser';
+import { supabaseBrowser } from '@/lib/supabase/browser';
 import { MessageSquareDot } from 'lucide-react';
-
 import Image from 'next/image';
-// import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Home() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  //   const navigate = useRouter();
+
   const [authError, setAuthError] = useState<string | null>(null);
 
   //google
   const handleGoogleSignIn = async () => {
     const supabase = supabaseBrowser();
-    // Use window.location.origin for client-side redirects
+
     const redirectTo = `${window.location.origin}/auth/callback`;
 
     setIsGoogleLoading(true);
