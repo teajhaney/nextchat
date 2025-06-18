@@ -7,7 +7,7 @@ export const useAuthStore = create<AuthState>(set => ({
   googleLoading: false,
   authError: null,
   userData: null,
-  setUser: user => set({ user,  }),
+  setUser: (user) => set({ user, loading: false }),
   setUserData: userData => set({ userData }),
   setLoading: loading => set({ loading }),
   setGoogleLoading: googleLoading => set({ googleLoading }),

@@ -5,21 +5,31 @@ import { useAuthStore } from '@/app/store/authStore';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setUser, clearAuth, setLoading } = useAuthStore();
+  const { setUser, clearAuth, setLoading, setUserData } = useAuthStore();
   const [isSessionChecked, setIsSessionChecked] = useState(false); // ✅ Track session check
 
   useEffect(() => {
     const supabase = supabaseBrowser();
 
     const initializeSession = async () => {
-      setLoading(true); // ✅ Ensure loading is true
+      setLoading(true);
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
         if (session?.user) {
-          setUser(session.user);
+          setUser(session.user); //set authenticated user
+
+          //fetch user profile data
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+          if (!error && profile) {
+            setUserData(profile);
+          }
         } else {
           clearAuth();
         }
@@ -27,13 +37,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearAuth();
         console.log(error);
       } finally {
-        setLoading(false); // ✅ Always clear loading
-        setIsSessionChecked(true); // ✅ Mark session check complete
+        setLoading(false);
+        setIsSessionChecked(true);
       }
     };
 
     initializeSession();
-
+    //listening for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -45,11 +55,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, clearAuth, setLoading]);
+  }, [setUser, clearAuth, setLoading, setUserData]);
 
-  // ✅ Only render children when session is checked
   if (!isSessionChecked) {
-    return null; // Or a loading spinner: <p>Loading...</p>
+    return;
   }
 
   return <>{children}</>;
