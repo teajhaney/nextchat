@@ -1,18 +1,24 @@
 'use client';
 import { useAuthStore } from '@/app/store/authStore';
 import React from 'react';
+import { LoadingSpinner } from '@/components';
 
 export const ChatListBar = () => {
-  const { otherUserData } = useAuthStore(state => state);
+  const { otherUserData, loading } = useAuthStore(state => state);
+
+  if (loading)
+    return (
+      <div>
+        <LoadingSpinner className="border-primary h-6 w-6 border-dashed border-2" />
+      </div>
+    );
 
   if (!otherUserData || otherUserData.length === 0) {
     return <p>No other users found.</p>;
   }
   return (
-    <div className=" gap-2 center-col">
-      {otherUserData?.map(item => (
-        <div key={item.id}>{item.full_name}</div>
-      ))}
-    </div>
+    <aside className="px-2 pt-2">
+     
+    </aside>
   );
 };

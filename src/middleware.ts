@@ -34,6 +34,15 @@ async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (
+    user &&
+    request.nextUrl.pathname === '/'
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/chat';
+    return NextResponse.redirect(url);
+  }
+
+  if (
     !user &&
     !request.nextUrl.pathname.startsWith('/') &&
     !request.nextUrl.pathname.startsWith('/auth/callback')

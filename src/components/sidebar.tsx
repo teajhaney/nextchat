@@ -63,7 +63,7 @@ export const Sidebar = () => {
         </div>
       </aside>
       {/* Secondary Sidebar */}
-      <aside className="h-screen w-64 border-r border-r-primary bg-background px-2 py-5 ">
+      <aside className="h-screen w-96 border-r border-r-primary bg-background ">
         <div className="secondary-sidebar w-full h-full">
           {activeItem === 'Chats' && <ChatListBar />}
           {activeItem === 'Settings' && <SettingsBar />}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
 import { supabaseBrowser } from '@/lib/supabase/browser';
+import { FullScreenLoader } from '@/components';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { setUser, clearAuth, setLoading, setUserData, setOtherUserData } = useAuthStore();
@@ -70,7 +71,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [setUser, clearAuth, setLoading, setUserData, setOtherUserData]);
 
   if (!isSessionChecked) {
-    return;
+    return <FullScreenLoader />;
   }
 
   return <>{children}</>;
