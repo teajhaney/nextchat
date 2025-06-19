@@ -5,6 +5,8 @@ export { ChatList } from './chatList';
 export { RecentChats } from './recentChats';
 export { SettingsBar } from './settingsBar';
 export { FullScreenLoader } from './fullScreenLoader';
+export { ChatScreen } from './chatScreen';
+export { NoChatScreen } from './noChatScreen';
 
 //shadcn component
 export { Button } from './ui/button';

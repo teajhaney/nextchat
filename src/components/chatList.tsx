@@ -1,10 +1,12 @@
-'use client'
+'use client';
 import { useAuthStore } from '@/app/store/authStore';
 import React from 'react';
 import Image from 'next/image';
 import { avatarUrl } from '@/constants';
+import { useMessageStore } from '@/app/store/messageStore';
 export const ChatList = () => {
   const { otherUserData } = useAuthStore(state => state);
+  const { setSelectedChatUser } = useMessageStore(state => state);
 
   if (!otherUserData || otherUserData.length === 0) {
     return <p>No other users found.</p>;
@@ -15,6 +17,7 @@ export const ChatList = () => {
       {otherUserData.map(({ id, full_name, avatar_url }) => (
         <div
           key={id}
+          onClick={() => setSelectedChatUser({ id, full_name, avatar_url })}
           className="p-3 flex justify-between items-center shadow rounded-sm cursor-pointer"
         >
           <div className="flex items-center gap-2">

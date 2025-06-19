@@ -23,3 +23,13 @@ export declare interface UserData {
   avatar_url?: string;
 }
 
+//message data which includes the user
+export declare interface MessageData {
+  id: string;
+  full_name: string;
+  avatar_url?: string;
+}
+export declare interface MessageState {
+  selectedChatUser: MessageData | null;
+  setSelectedChatUser: (user: MessageData) => void;
+}
