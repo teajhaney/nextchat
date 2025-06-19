@@ -6,6 +6,9 @@
   --foreground: #171717;
   --primary: #724cf7;
   --text: #141b27;
+  --gray50: #f9fafb;
+  --gray100: #f3f4f6;
+  --gray200: #e5e7eb;
 }
 
 @theme inline {
@@ -14,6 +17,9 @@
   --color-primary: var(--primary);
   --color-textColor: var(--text);
   --font-roboto: var(--font-roboto);
+  --color-gray50: var(--gray50);
+  --color-gray100: var(--gray100);
+  --color-gray200: var(--gray200);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,6 +28,9 @@
     --foreground: #ededed;
     --primary: #724cf7;
     --text: #c5c8cc;
+    --gray50: #f9fafb;
+    --gray100: #f3f4f6;
+    --gray200: #e5e7eb;
   }
 }
 
@@ -43,6 +52,9 @@ body {
   }
   .font-lato {
     font-family: var(--font-lato);
+  }
+  .shdow {
+    @apply shadow-[0px_4px_8px_rgba(0,0,0,0.1)];
   }
 }
 

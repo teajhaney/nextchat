@@ -1,0 +1,35 @@
+'use client';
+import { useAuthStore } from '@/app/store/authStore';
+import React from 'react';
+import Image from 'next/image';
+import { avatarUrl } from '@/constants';
+export const RecentChats = () => {
+  const { otherUserData } = useAuthStore(state => state);
+
+  if (!otherUserData || otherUserData.length === 0) {
+    return <p>No other users found.</p>;
+  }
+  return (
+    <div className="flex justify-around">
+      {otherUserData.slice(0, 4).map(({ id, full_name, avatar_url }) => {
+        const fullName = full_name || '';
+        const [firstName] = fullName.split(' ');
+
+        return (
+          <div key={id} className="flex flex-col items-center gap-2">
+            <Image
+              src={avatar_url || avatarUrl}
+              alt={full_name}
+              width={40}
+              height={40}
+              className="size-15 rounded-full"
+            />
+            <div className="">
+              <h1 className="text-sm">{firstName}</h1>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};

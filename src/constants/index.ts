@@ -10,3 +10,7 @@ export const sidebarItems = [
     icon: Settings,
   },
 ];
+
+
+  // Fallback avatar if userData or avatar_url is missing
+  export const avatarUrl = '/images/google.svg'; // Add a default image in public folder

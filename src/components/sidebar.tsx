@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { MessageSquareDot } from 'lucide-react';
-import { sidebarItems } from '@/constants';
+import { avatarUrl, sidebarItems } from '@/constants';
 import { ChatListBar, SettingsBar } from '@/components';
 import clsx from 'clsx';
 import Image from 'next/image';
@@ -21,9 +21,6 @@ export const Sidebar = () => {
       { opacity: 1, duration: 0.5, ease: 'power2.inOut' }
     );
   }, [activeItem]);
-
-  // Fallback avatar if userData or avatar_url is missing
-  const avatarUrl = '/images/google.svg'; // Add a default image in public folder
 
   return (
     <div className="flex h-screen">
@@ -55,7 +52,7 @@ export const Sidebar = () => {
         <div>
           <Image
             src={userData?.avatar_url || avatarUrl}
-            alt={avatarUrl}
+            alt={userData?.full_name || 'logged in user image'}
             width={24}
             height={24}
             className="h-auto w-auto rounded-full"
