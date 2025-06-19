@@ -9,6 +9,8 @@ export { ChatScreen } from './chatScreen';
 export { NoChatScreen } from './noChatScreen';
 export { ChatOptions } from './chatOptions';
 export { ChatHeader } from './chatHeader';
+export { MessageInputOptions } from './messageInputOptions';
+export { ChatInput } from './chatInput';
 
 //shadcn component
 export { Button } from './ui/button';

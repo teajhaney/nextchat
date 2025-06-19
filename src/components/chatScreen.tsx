@@ -1,6 +1,7 @@
-'use client';
+
 import React from 'react';
 import { ChatHeader } from './chatHeader';
+import { ChatInput } from '@/components';
 
 export const ChatScreen = () => {
   return (
@@ -10,7 +11,12 @@ export const ChatScreen = () => {
       </div>
       <div className="flex-1 bg-primary"></div>
       {/* chat input */}
-      <div></div>
+      <div className="p-5">
+        {' '}
+        <div className="">
+       <ChatInput />
+        </div>
+      </div>
     </div>
   );
 };

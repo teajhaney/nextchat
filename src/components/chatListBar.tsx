@@ -2,7 +2,7 @@
 import { useAuthStore } from '@/app/store/authStore';
 import React from 'react';
 import { Input, LoadingSpinner, ChatList, RecentChats } from '@/components';
-import { CirclePlus, FunnelPlus, Search } from 'lucide-react';
+import { CirclePlus, FunnelPlus, } from 'lucide-react';
 
 const App = () => {
   return <CirclePlus />;
@@ -31,13 +31,13 @@ export const ChatListBar = () => {
           </div>
         </div>
 
-        <div className="relative">
+        <div className="">
           <Input
             type="text"
             placeholder="Search for messages or contacts"
-            className="pl-2 border-none focus:border-none focus:outline-none shadow w-full"
+            className="px-2 border-none focus:border-none focus:outline-none shadow w-full"
           />
-          <Search className="size-5 absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        
         </div>
       </div>
       {/* recent chat */}

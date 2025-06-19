@@ -10,7 +10,7 @@ export const ChatOptions = () => {
           className="text-gray size-5 cursor-pointer"
           onClick={() => {
             switch (title) {
-              case 'search':
+              case 'Search':
                 console.log('Search clicked');
                 break;
               case 'Video call':
