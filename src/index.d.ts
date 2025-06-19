@@ -9,7 +9,7 @@ export declare interface AuthState {
   authError: string | null;
   setUser: (user: User | null) => void;
   setUserData: (userData: UserData | null) => void;
-  setOtherUserData: (otherUserData: userData[]) => void;
+  setOtherUserData: (otherUserData: UserData[]) => void;
   setLoading: (loading: boolean) => void;
   setGoogleLoading: (loading: boolean) => void;
   setAuthError: (error: string | null) => void;

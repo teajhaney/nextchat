@@ -1,3 +1,4 @@
+
 import { AuthState } from '@/index';
 import { create } from 'zustand';
 
@@ -20,5 +21,8 @@ export const useAuthStore = create<AuthState>(set => ({
       loading: false,
       authError: null,
       userData: null,
+      otherUserData: [],
     }),
 }));
+
+

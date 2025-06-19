@@ -22,25 +22,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(session.user); //set authenticated user
 
           //fetch user profile data
-          const { data: profile, error } = await supabase
+          const { data: userProfile, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
-          if (!error && profile) {
-            setUserData(profile); //set user data
+          if (!error && userProfile) {
+            setUserData(userProfile); //set user data
           }
 
           // Fetch all other users except the current one
-          const { data: otherUsers, error: othersError } = await supabase
+          const { data: otherUsersProfile, error: othersError } = await supabase
             .from('profiles')
             .select('*')
             .neq('id', session.user.id);
 
-          if (!othersError && otherUsers) {
+          if (!othersError && otherUsersProfile) {
             // You can store this in Zustand store or local state
-            setOtherUserData(otherUsers);
-          } 
+            setOtherUserData(otherUsersProfile);
+          }
         } else {
           clearAuth();
         }
