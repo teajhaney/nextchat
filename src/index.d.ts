@@ -5,9 +5,11 @@ export declare interface AuthState {
   loading: boolean;
   googleLoading: boolean;
   userData: UserData | null;
+  otherUserData: UserData[];
   authError: string | null;
   setUser: (user: User | null) => void;
   setUserData: (userData: UserData | null) => void;
+  setOtherUserData: (otherUserData: userData[]) => void;
   setLoading: (loading: boolean) => void;
   setGoogleLoading: (loading: boolean) => void;
   setAuthError: (error: string | null) => void;
@@ -20,3 +22,4 @@ export declare interface UserData {
   email: string;
   avatar_url?: string;
 }
+

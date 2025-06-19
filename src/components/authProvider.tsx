@@ -5,7 +5,7 @@ import { useAuthStore } from '@/app/store/authStore';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setUser, clearAuth, setLoading, setUserData } = useAuthStore();
+  const { setUser, clearAuth, setLoading, setUserData, setOtherUserData } = useAuthStore();
   const [isSessionChecked, setIsSessionChecked] = useState(false); // ✅ Track session check
 
   useEffect(() => {
@@ -28,8 +28,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             .eq('id', session.user.id)
             .single();
           if (!error && profile) {
-            setUserData(profile);
+            setUserData(profile); //set user data
           }
+
+          // Fetch all other users except the current one
+          const { data: otherUsers, error: othersError } = await supabase
+            .from('profiles')
+            .select('*')
+            .neq('id', session.user.id);
+
+          if (!othersError && otherUsers) {
+            // You can store this in Zustand store or local state
+            setOtherUserData(otherUsers);
+          } 
         } else {
           clearAuth();
         }
@@ -43,6 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     initializeSession();
+
     //listening for auth state changes
     const {
       data: { subscription },
@@ -55,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, clearAuth, setLoading, setUserData]);
+  }, [setUser, clearAuth, setLoading, setUserData, setOtherUserData]);
 
   if (!isSessionChecked) {
     return;

@@ -7,9 +7,11 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import gsap from 'gsap';
 import Link from 'next/link';
+import { useAuthStore } from '@/app/store/authStore';
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
+  const { userData } = useAuthStore(state => state);
 
   //
   useEffect(() => {
@@ -18,7 +20,7 @@ export const Sidebar = () => {
       { opacity: 0 },
       { opacity: 1, duration: 0.5, ease: 'power2.inOut' }
     );
-  }, [activeItem,]);
+  }, [activeItem]);
 
   // Fallback avatar if userData or avatar_url is missing
   const avatarUrl = '/images/google.svg'; // Add a default image in public folder
@@ -52,7 +54,7 @@ export const Sidebar = () => {
         </div>
         <div>
           <Image
-            src={avatarUrl}
+            src={userData?.avatar_url || avatarUrl}
             alt={avatarUrl}
             width={24}
             height={24}
