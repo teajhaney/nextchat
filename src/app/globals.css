@@ -9,6 +9,7 @@
   --gray50: #f9fafb;
   --gray100: #f3f4f6;
   --gray200: #e5e7eb;
+  --gray: #72767c;
 }
 
 @theme inline {
@@ -20,6 +21,7 @@
   --color-gray50: var(--gray50);
   --color-gray100: var(--gray100);
   --color-gray200: var(--gray200);
+  --color-gray: var(--gray);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,6 +33,7 @@
     --gray50: #f9fafb;
     --gray100: #f3f4f6;
     --gray200: #e5e7eb;
+    --gray: #72767c;
   }
 }
 

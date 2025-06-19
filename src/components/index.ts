@@ -7,6 +7,8 @@ export { SettingsBar } from './settingsBar';
 export { FullScreenLoader } from './fullScreenLoader';
 export { ChatScreen } from './chatScreen';
 export { NoChatScreen } from './noChatScreen';
+export { ChatOptions } from './chatOptions';
+export { ChatHeader } from './chatHeader';
 
 //shadcn component
 export { Button } from './ui/button';

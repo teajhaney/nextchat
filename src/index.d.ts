@@ -28,6 +28,7 @@ declare interface MessageData {
   id: string;
   full_name: string;
   avatar_url?: string;
+  email: string;
 }
 declare interface MessageState {
   selectedChatUser: MessageData | null;

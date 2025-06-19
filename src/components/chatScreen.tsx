@@ -1,10 +1,16 @@
+'use client';
 import React from 'react';
-import { MessageData } from '@/index';
-export const ChatScreen = ({ currentMessageUser }: { currentMessageUser: MessageData }) => {
+import { ChatHeader } from './chatHeader';
+
+export const ChatScreen = () => {
   return (
-    <div className="p-4">
-      <h1 className="text-lg font-bold">Chatting with {currentMessageUser.full_name}</h1>
-      {/* Chat UI here */}
+    <div className="h-screen flex flex-col">
+      <div>
+        <ChatHeader />
+      </div>
+      <div className="flex-1 bg-primary"></div>
+      {/* chat input */}
+      <div></div>
     </div>
   );
 };
