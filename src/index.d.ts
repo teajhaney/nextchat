@@ -1,6 +1,6 @@
 import { User } from '@/lib/supabase/supabase';
 
-export declare interface AuthState {
+declare interface AuthState {
   user: User | null;
   loading: boolean;
   googleLoading: boolean;
@@ -16,7 +16,7 @@ export declare interface AuthState {
   clearAuth: () => void;
 }
 
-export declare interface UserData {
+declare interface UserData {
   id: string;
   full_name: string;
   email: string;
@@ -24,12 +24,12 @@ export declare interface UserData {
 }
 
 //message data which includes the user
-export declare interface MessageData {
+declare interface MessageData {
   id: string;
   full_name: string;
   avatar_url?: string;
 }
-export declare interface MessageState {
+declare interface MessageState {
   selectedChatUser: MessageData | null;
   setSelectedChatUser: (user: MessageData) => void;
 }
