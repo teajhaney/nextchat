@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { ChatHeader } from './chatHeader';
-import { ChatInput } from '@/components';
+import { ChatInput, Chats } from '@/components';
 
 export const ChatScreen = () => {
   return (
@@ -9,12 +8,14 @@ export const ChatScreen = () => {
       <div>
         <ChatHeader />
       </div>
-      <div className="flex-1 bg-primary"></div>
+      <div className="flex-1 bg-primary">
+        <Chats />
+      </div>
       {/* chat input */}
       <div className="p-5">
         {' '}
         <div className="">
-       <ChatInput />
+          <ChatInput />
         </div>
       </div>
     </div>

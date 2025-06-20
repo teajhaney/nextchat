@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,11 +7,24 @@ import { supabaseBrowser } from '@/lib/supabase/browser';
 import { FullScreenLoader } from '@/components';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setUser, clearAuth, setLoading, setUserData, setOtherUserData } = useAuthStore();
-  const [isSessionChecked, setIsSessionChecked] = useState(false); // ✅ Track session check
+  const { setUser, clearAuth, setLoading, setUserData, setOtherUserData, setAuthError } =
+    useAuthStore();
+  const [isSessionChecked, setIsSessionChecked] = useState(false); // Track session check
+  const LOCAL_STORAGE_KEY = 'nextchat_auth';
 
   useEffect(() => {
     const supabase = supabaseBrowser();
+
+    //check local storage for session
+    const cachedAuth = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (cachedAuth) {
+      const parsedData = JSON.parse(cachedAuth);
+      setUser(parsedData.user);
+      setUserData(parsedData.userData);
+      setOtherUserData(parsedData.otherUserData || []);
+      setLoading(false);
+      setIsSessionChecked(true); // App is ready
+    }
 
     const initializeSession = async () => {
       setLoading(true);
@@ -42,19 +56,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             // You can store this in Zustand store or local state
             setOtherUserData(otherUsersProfile);
           }
+
+          const authData = {
+            user: session.user,
+            userData: userProfile,
+            otherUserData: otherUsersProfile || [],
+          };
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(authData));
         } else {
           clearAuth();
         }
-      } catch (error) {
+      } catch (error: any) {
         clearAuth();
-        console.log(error);
+        setAuthError(error.message);
       } finally {
         setLoading(false);
         setIsSessionChecked(true);
       }
     };
 
-    initializeSession();
+    if (!cachedAuth) {
+      initializeSession();
+    }
 
     //listening for auth state changes
     const {
@@ -63,12 +86,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session?.user) {
         setUser(session.user);
       } else {
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
         clearAuth();
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, clearAuth, setLoading, setUserData, setOtherUserData]);
+  }, [setUser, clearAuth, setLoading, setUserData, setOtherUserData, setAuthError]);
 
   if (!isSessionChecked) {
     return <FullScreenLoader />;
