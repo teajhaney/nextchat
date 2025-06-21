@@ -20,6 +20,7 @@ export { Button } from './ui/button';
 export { Input } from './ui/input';
 export { Toaster } from './ui/sonner';
 export { toast } from 'sonner';
+export { Form } from './ui/form';
 
 //auth provider
 export { AuthProvider } from './authProvider';

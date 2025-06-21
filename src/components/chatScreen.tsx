@@ -14,9 +14,7 @@ export const ChatScreen = () => {
       {/* chat input */}
       <div className="p-5">
         {' '}
-        <div className="">
-          <ChatInput />
-        </div>
+        <ChatInput />
       </div>
     </div>
   );
