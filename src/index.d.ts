@@ -1,4 +1,4 @@
-import { User } from '@/lib/supabase/supabase';
+import { User, RealtimeChannel } from '@/lib/supabase/supabase';
 
 declare interface AuthState {
   user: User | null;
@@ -23,14 +23,33 @@ declare interface UserData {
   avatar_url?: string;
 }
 
-//message data which includes the user
-declare interface MessageData {
+//profile data which includes the user
+declare interface ProfileData {
   id: string;
   full_name: string;
   avatar_url?: string;
   email: string;
 }
+
 declare interface MessageState {
-  selectedChatUser: MessageData | null;
-  setSelectedChatUser: (user: MessageData) => void;
+  messages: Message[];
+  selectedChatUser: Profile | null;
+  subscription: RealtimeChannel | null;
+  setSelectedChatUser: (user: Profile) => void;
+  fetchMessages: (otherUserId: string) => Promise<void>;
+  sendMessage: (content: string) => Promise<void>;
+  addMessage: (message: Message) => void;
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
+}
+
+// Tmessage data
+declare interface Message {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  content: string;
+  created_at: string;
+  is_read: boolean;
+  isPending?: boolean;
 }

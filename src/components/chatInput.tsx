@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Button, Input } from '@/components';
 import { messageInputOptions } from '@/constants';
 import { Send } from 'lucide-react';
@@ -9,12 +8,12 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
+import { useMessageStore } from '@/app/store/messageStore';
 
 const formSchema = z.object({
   message: z.string().min(1),
 });
 export const ChatInput = () => {
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -22,12 +21,15 @@ export const ChatInput = () => {
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+  const { sendMessage, subscribeToMessages } = useMessageStore();
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
-  }
+
+    await sendMessage(values.message);
+    subscribeToMessages();
+    form.reset();
+  };
 
   return (
     <Form {...form}>
@@ -47,8 +49,6 @@ export const ChatInput = () => {
                     {...field}
                   />
                 </FormControl>
-
-           
               </FormItem>
             )}
           />
@@ -80,6 +80,7 @@ export const ChatInput = () => {
             type="submit"
             className="center cursor-pointer border-primary"
             variant={'outline'}
+            disabled={!form.watch('message')?.trim()}
           >
             {' '}
             <Send className="text-primary" />

@@ -33,12 +33,16 @@ async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (
-    user &&
-    request.nextUrl.pathname === '/'
-  ) {
+  if (user && request.nextUrl.pathname === '/') {
     const url = request.nextUrl.clone();
     url.pathname = '/chat';
+    return NextResponse.redirect(url);
+  }
+
+  ////
+  if (!user && request.nextUrl.pathname === '/chat') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
     return NextResponse.redirect(url);
   }
 
@@ -52,7 +56,6 @@ async function updateSession(request: NextRequest) {
     url.search = '?error=please_sign_in';
     return NextResponse.redirect(url);
   }
-  
 
   return supabaseResponse;
 }

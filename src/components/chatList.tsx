@@ -4,9 +4,10 @@ import React from 'react';
 import Image from 'next/image';
 import { avatarUrl } from '@/constants';
 import { useMessageStore } from '@/app/store/messageStore';
+import clsx from 'clsx';
 export const ChatList = () => {
   const { otherUserData } = useAuthStore(state => state);
-  const { setSelectedChatUser } = useMessageStore(state => state);
+  const { setSelectedChatUser, selectedChatUser } = useMessageStore(state => state);
 
   if (!otherUserData || otherUserData.length === 0) {
     return <p>No other users found.</p>;
@@ -18,7 +19,10 @@ export const ChatList = () => {
         <div
           key={id}
           onClick={() => setSelectedChatUser({ id, full_name, avatar_url, email })}
-          className="p-3 flex justify-between items-center shadow rounded-sm cursor-pointer"
+          className={clsx(
+            'p-3 flex justify-between items-center shadow rounded-sm cursor-pointer',
+            selectedChatUser?.id === id && 'border border-primary'
+          )}
         >
           <div className="flex items-center gap-2">
             <Image
