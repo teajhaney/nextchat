@@ -12,6 +12,8 @@ export { ChatHeader } from './chatHeader';
 export { MessageInputOptions } from './messageInputOptions';
 export { ChatInput } from './chatInput';
 export { Chats } from './chats';
+export { SingleChat } from './singleChat';
+export { GroupChats } from './groupChats';
 
 //shadcn component
 export { Button } from './ui/button';

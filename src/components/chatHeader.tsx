@@ -16,7 +16,7 @@ export const ChatHeader = () => {
       gsap.fromTo(
         headerRef.current,
         { opacity: 0 },
-        { opacity: 1, duration: 1.0, ease: 'power2.inOut' }
+        { opacity: 1, duration: 0.5, ease: 'power2.inOut' }
       );
     }
   }, [selectedChatUser]);
