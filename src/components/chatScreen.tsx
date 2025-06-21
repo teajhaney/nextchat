@@ -8,7 +8,7 @@ export const ChatScreen = () => {
       <div>
         <ChatHeader />
       </div>
-      <div className="flex-1 bg-primary">
+      <div className="flex-1 bg-gray100 overflow-y-auto">
         <Chats />
       </div>
       {/* chat input */}
