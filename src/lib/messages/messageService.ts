@@ -1,7 +1,7 @@
 'use server';
 
 import { supabaseServer } from '../supabase/server';
-import { Message } from '@/index';
+import { Message } from '@/types/index';
 
 export const fetchMessages = async (otherUserId: string): Promise<Message[]> => {
   const supabase = await supabaseServer();
@@ -27,9 +27,9 @@ export const sendMessage = async (recipientId: string, content: string): Promise
   const supabase = await supabaseServer();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser(); 
 
-  if (!user) throw new Error('No user');
+  if (!user) throw new Error('No user'); 
 
   const { data, error } = await supabase
     .from('messages')
@@ -40,5 +40,4 @@ export const sendMessage = async (recipientId: string, content: string): Promise
   if (error) throw new Error(error.message);
   return data;
 };
-
-// Optional: Keep subscription logic separate if it’s used on the client side only
+ 

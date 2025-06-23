@@ -1,11 +1,8 @@
-
-
 import { create } from 'zustand';
 import { fetchMessages, sendMessage } from '@/lib/messages/messageService';
 import { subscribeToMessages } from '@/lib/messages/messageSubscription';
-import { MessageState } from '@/index';
+import { MessageState } from '@/types/index';
 import { supabase } from '@/lib/supabase/supabase';
-import { v4 as uuidv4 } from 'uuid';
 
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
@@ -28,26 +25,9 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   sendMessage: async content => {
     const { selectedChatUser } = get();
     if (!selectedChatUser) return;
-
-    // Optimistic message logic
-    const optimisticMessage = {
-      id: uuidv4(),
-      sender_id: (await supabase.auth.getUser()).data.user?.id || '',
-      recipient_id: selectedChatUser.id,
-      content,
-      created_at: new Date().toISOString(),
-      is_read: false,
-      isPending: true,
-    };
-    set(state => ({ messages: [...state.messages, optimisticMessage] }));
-
     try {
-      const confirmedMessage = await sendMessage(selectedChatUser.id, content);
-      set(state => ({
-        messages: state.messages.map(msg =>
-          msg.id === optimisticMessage.id ? confirmedMessage : msg
-        ),
-      }));
+      const message = await sendMessage(selectedChatUser.id, content);
+      set(state => ({ messages: [...state.messages, message] }));
     } catch (error) {
       console.error('Failed to send message:', error);
     }
@@ -75,3 +55,9 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     supabase.removeAllChannels();
   },
 }));
+
+
+
+
+
+

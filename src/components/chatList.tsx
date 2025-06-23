@@ -12,6 +12,8 @@ export const ChatList = () => {
   if (!otherUserData || otherUserData.length === 0) {
     return <p>No other users found.</p>;
   }
+	
+	
 
   return (
     <div className="space-y-3">

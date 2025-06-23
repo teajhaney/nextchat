@@ -1,5 +1,4 @@
-
-import { AuthState } from '@/index';
+import { AuthState } from '@/types/index';
 import { create } from 'zustand';
 
 export const useAuthStore = create<AuthState>(set => ({
@@ -24,5 +23,3 @@ export const useAuthStore = create<AuthState>(set => ({
       otherUserData: [],
     }),
 }));
-
-

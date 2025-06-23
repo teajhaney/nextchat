@@ -43,7 +43,7 @@ declare interface MessageState {
   unsubscribeFromMessages: () => void;
 }
 
-// Tmessage data
+// Tmessage data 
 declare interface Message {
   id: string;
   sender_id: string;

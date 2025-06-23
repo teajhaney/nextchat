@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import Image from 'next/image';
 import { useMessageStore } from '@/app/store/messageStore';
 import { useAuthStore } from '@/app/store/authStore';
@@ -17,11 +17,10 @@ export const SingleChat = () => {
 
   useEffect(() => {
     if (selectedChatUser) {
-      console.log('selected user ID:', selectedChatUser?.id); // Debug log
       fetchMessages(selectedChatUser.id);
       subscribeToMessages();
     }
-  }, [selectedChatUser, , fetchMessages, subscribeToMessages, , user]);
+  }, [selectedChatUser, , fetchMessages, subscribeToMessages]);
 
   return (
     <div className="p-2">
@@ -46,7 +45,10 @@ export const SingleChat = () => {
               message.sender_id === user?.id ? 'rounded-tl-lg ' : 'rounded-tr-lg'
             }`}
           >
-            <p className="text-gray-800">{message.content}</p>
+            <Suspense fallback={'loading..'}>
+              {' '}
+              <p className="text-gray-800">{message.content}</p>
+            </Suspense>
           </div>
         </div>
       ))}

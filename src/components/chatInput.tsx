@@ -3,7 +3,6 @@
 import { Button, Input } from '@/components';
 import { messageInputOptions } from '@/constants';
 import { Send } from 'lucide-react';
-
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -24,8 +23,6 @@ export const ChatInput = () => {
   const { sendMessage, subscribeToMessages } = useMessageStore();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-
     await sendMessage(values.message);
     subscribeToMessages();
     form.reset();
