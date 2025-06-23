@@ -151,10 +151,10 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   },
 
   //subscribe to messages for the selected user
-  subscribeToMessages: () => {
+  subscribeToMessages:async () => {
     const { selectedChatUser, addMessage } = get();
 
-    const subscription = subscribeToMessages(selectedChatUser.id, addMessage);
+    const subscription =await subscribeToMessages(selectedChatUser.id, addMessage);
     set({ subscription }); // Optional: store subscription if needed for cleanup
   },
 

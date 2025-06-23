@@ -22,7 +22,8 @@ export const SingleChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
+	useEffect(() => {
+
     if (selectedChatUser) {
       fetchMessages(selectedChatUser.id);
       subscribeToMessages();
