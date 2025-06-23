@@ -11,6 +11,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   selectedChatUser: null,
   isLoading: false,
   subscription: null,
+  currentFetchId: null, //used for 2nd fetch approach
 
   setSelectedChatUser: async user => {
     const { subscription, unsubscribeFromMessages } = get();
@@ -42,15 +43,50 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     try {
       const messages = await fetchMessages(otherUserId);
 
-      if (selectedChatUser?.id === otherUserId) {
-        set({ messages });
+      // Double check if selected chat has not changed during async call
+      const currentChatUser = get().selectedChatUser;
+      if (currentChatUser?.id === otherUserId) {
+        set({ messages, isLoading: false });
       }
     } catch (error) {
       console.error('Failed to fetch messages:', error);
-    } finally {
-      set({ isLoading: false });
     }
   },
+  //fetch messages for the selected user-- another approach which gives each fech a unique id.
+  //   fetchMessages: async otherUserId => {
+  //     const { selectedChatUser } = get();
+
+  //     // Ensure we're still on the same chat (prevent race conditions)
+  //     if (!selectedChatUser || selectedChatUser.id !== otherUserId) {
+  //       return;
+  //     }
+
+  //     // If no fetchId provided, generate one (for backwards compatibility)
+
+  //     const fetchId = uuidv4();
+  //     set({ currentFetchId: fetchId });
+
+  //     try {
+  //       const messages = await fetchMessages(otherUserId);
+
+  //       // Double-check: only update if this is still the current fetch and current user
+  //       const currentState = get();
+  //       if (
+  //         currentState.selectedChatUser?.id === otherUserId &&
+  //         currentState.currentFetchId === fetchId
+  //       ) {
+  //         set({ messages, isLoading: false });
+  //       }
+  //       // If this is not the current fetch, just ignore the results
+  //     } catch (error) {
+  //       console.error('Failed to fetch messages:', error);
+  //       // Only update loading state if this is still the current fetch
+  //       const currentState = get();
+  //       if (currentState.currentFetchId === fetchId) {
+  //         set({ isLoading: false });
+  //       }
+  //     }
+  //   },
 
   //send message to the selected user
   sendMessage: async content => {

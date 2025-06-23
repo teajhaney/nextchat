@@ -32,7 +32,7 @@ export const SingleChat = () => {
   if (isLoading) {
     return (
       <div className="center-col items-center justify-center p-8">
-        <LoadingSpinner className="size-6 border border-primary border-dashed" />
+        <LoadingSpinner className="size-6 border-2 border-primary border-dashed" />
         <span className="ml-2 text-primary">Loading messages...</span>
       </div>
     );

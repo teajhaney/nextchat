@@ -36,6 +36,7 @@ declare interface MessageState {
   isLoading: boolean;
   selectedChatUser: Profile | null;
   subscription: RealtimeChannel | null;
+  currentFetchId: string | null;
   setSelectedChatUser: (user: Profile) => void;
   fetchMessages: (otherUserId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
