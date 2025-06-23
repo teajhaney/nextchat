@@ -40,4 +40,3 @@ export const sendMessage = async (recipientId: string, content: string): Promise
   if (error) throw new Error(error.message);
   return data;
 };
- 

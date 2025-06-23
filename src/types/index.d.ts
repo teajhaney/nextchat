@@ -33,6 +33,7 @@ declare interface ProfileData {
 
 declare interface MessageState {
   messages: Message[];
+  isLoading: boolean;
   selectedChatUser: Profile | null;
   subscription: RealtimeChannel | null;
   setSelectedChatUser: (user: Profile) => void;
@@ -41,10 +42,9 @@ declare interface MessageState {
   addMessage: (message: Message) => void;
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
- 
 }
 
-// Tmessage data 
+// Tmessage data
 declare interface Message {
   id: string;
   sender_id: string;
@@ -53,7 +53,5 @@ declare interface Message {
   created_at: string;
   is_read: boolean;
   isPending?: boolean;
+  isLoading?: boolean;
 }
-
-
-

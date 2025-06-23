@@ -9,18 +9,22 @@ import { useAuthStore } from './authStore';
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
   selectedChatUser: null,
-
+  isLoading: false,
   subscription: null,
 
-  setSelectedChatUser: user => {
+  setSelectedChatUser: async user => {
     const { subscription, unsubscribeFromMessages } = get();
+
+    set({
+      isLoading: true,
+      selectedChatUser: user,
+      messages: [],
+    });
 
     // Unsubscribe from previous chat
     if (subscription) {
       unsubscribeFromMessages();
     }
-
-    set({ selectedChatUser: user, messages: [], subscription: null });
 
     // fetch fresh messages and subscribe
     get().fetchMessages(user.id);
@@ -28,11 +32,23 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   },
   //fetch messages for the selected user
   fetchMessages: async otherUserId => {
+    const { selectedChatUser } = get();
+
+    // Ensure we're still on the same chat (prevent race conditions)
+    if (!selectedChatUser || selectedChatUser.id !== otherUserId) {
+      return;
+    }
+
     try {
       const messages = await fetchMessages(otherUserId);
-      set({ messages });
+
+      if (selectedChatUser?.id === otherUserId) {
+        set({ messages });
+      }
     } catch (error) {
       console.error('Failed to fetch messages:', error);
+    } finally {
+      set({ isLoading: false });
     }
   },
 
@@ -49,30 +65,30 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       content,
       created_at: new Date().toISOString(),
       is_read: false,
-      isPending: true, // Mark as pending
+      isPending: true,
     };
 
-    // Get current user ID (you'll need to pass this or get it from auth store)
+    // Get current user ID
     const { user } = useAuthStore.getState(); // Import this
     if (user) {
       optimisticMessage.sender_id = user.id;
     }
 
-    // Immediately add to UI
-    const newMessages = [...messages, optimisticMessage];
-    set({ messages: newMessages });
+    // Immediately added to UI
+    const newMessage = [...messages, optimisticMessage];
+    set({ messages: newMessage });
 
     try {
       const message = await sendMessage(selectedChatUser.id, content);
 
       // Replace optimistic message with real one
-      const updatedMessages = newMessages.map(msg =>
-        msg.id === optimisticMessage.id ? message : msg
+      const updatedMessages = newMessage.map(newMessage =>
+        newMessage.id === optimisticMessage.id ? message : newMessage
       );
 
       set({ messages: updatedMessages });
     } catch (error) {
-      // Remove optimistic message on failure
+      // Remove optimistic message on failure, i.e set messages to evry other messages except the current message being sent
       const failedMessages = messages.filter(msg => msg.id !== optimisticMessage.id);
       set({ messages: failedMessages });
       console.error('Failed to send message:', error);

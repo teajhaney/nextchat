@@ -4,15 +4,11 @@ import Image from 'next/image';
 import { useMessageStore } from '@/app/store/messageStore';
 import { useAuthStore } from '@/app/store/authStore';
 import { Check, CheckCheck } from 'lucide-react';
+import { LoadingSpinner } from '@/components';
 
 export const SingleChat = () => {
-  const {
-    messages,
-    selectedChatUser,
-
-    fetchMessages,
-    subscribeToMessages,
-  } = useMessageStore();
+  const { messages, selectedChatUser, fetchMessages, isLoading, subscribeToMessages } =
+    useMessageStore();
 
   const { user, userData } = useAuthStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -31,8 +27,23 @@ export const SingleChat = () => {
       fetchMessages(selectedChatUser.id);
       subscribeToMessages();
     }
-  }, [selectedChatUser, , fetchMessages, subscribeToMessages]);
+  }, [selectedChatUser, fetchMessages, subscribeToMessages]);
 
+  if (isLoading) {
+    return (
+      <div className="center-col items-center justify-center p-8">
+        <LoadingSpinner className="size-6 border border-primary border-dashed" />
+        <span className="ml-2 text-primary">Loading messages...</span>
+      </div>
+    );
+  }
+  if (messages.length === 0) {
+    return (
+      <div className="center-col items-center justify-center p-8">
+        <p className="ml-2 text-primary">No message available</p>
+      </div>
+    );
+  }
   return (
     <div className="p-2">
       {messages.map(message => {
@@ -63,6 +74,7 @@ export const SingleChat = () => {
                   })}
                 </div>
 
+                {/* Only showing check marks for own messages */}
                 {isOwnMessage && (
                   <div>
                     {message.isPending ? (
