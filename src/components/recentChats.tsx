@@ -28,7 +28,7 @@ export const RecentChats = () => {
               alt={full_name}
               width={40}
               height={40}
-              className="size-15 rounded-full"
+              className="size-10 rounded-full"
             />
             <div className="">
               <h1 className="text-sm text-gray">{firstName}</h1>

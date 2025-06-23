@@ -11,14 +11,15 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   selectedChatUser: null,
   isLoading: false,
   subscription: null,
-  currentFetchId: null, //used for 2nd fetch approach
-
+  currentChatUserId: null, //used for 1st fetch approach
+  currentFetchId: null,
   setSelectedChatUser: async user => {
     const { subscription, unsubscribeFromMessages } = get();
-
+	if (user.id === get().currentChatUserId) return;
     set({
       isLoading: true,
       selectedChatUser: user,
+      currentChatUserId: user.id,
       messages: [],
     });
 
@@ -105,7 +106,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     };
 
     // Get current user ID
-    const { user } = useAuthStore.getState(); // Import this
+    const { user } = useAuthStore.getState();
     if (user) {
       optimisticMessage.sender_id = user.id;
     }
@@ -141,8 +142,10 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     if (exists) return;
 
     // Check if this message belongs to current chat
+    const { user } = useAuthStore.getState();
     const isCurrentChat =
-      message.sender_id === selectedChatUser.id || message.recipient_id === selectedChatUser.id;
+      (message.sender_id === user.id && message.recipient_id === selectedChatUser.id) ||
+      (message.sender_id === selectedChatUser.id && message.recipient_id === user.id);
 
     if (isCurrentChat) {
       const newMessages = [...messages, message];
@@ -151,10 +154,10 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   },
 
   //subscribe to messages for the selected user
-  subscribeToMessages:async () => {
+  subscribeToMessages: async () => {
     const { selectedChatUser, addMessage } = get();
 
-    const subscription =await subscribeToMessages(selectedChatUser.id, addMessage);
+    const subscription = await subscribeToMessages(selectedChatUser.id, addMessage);
     set({ subscription }); // Optional: store subscription if needed for cleanup
   },
 
@@ -162,10 +165,10 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   unsubscribeFromMessages: async () => {
     const { subscription } = get();
     if (subscription) {
-      supabase.channel(subscription).unsubscribe();
+      supabase.removeChannel(subscription);
       set({ subscription: null });
     }
     // Optionally remove all channels if needed
-    supabase.removeAllChannels();
+    // supabase.removeAllChannels();
   },
 }));

@@ -29,9 +29,9 @@ export const ChatList = () => {
               <Image
                 src={avatar_url || avatarUrl}
                 alt={full_name}
-                width={40}
-                height={40}
-                className="size-15 rounded-full"
+                width={30}
+                height={30}
+                className="size-10 rounded-full"
               />
               <div className="flex flex-col justify-between">
                 <h1 className={clsx(selectedChat && 'font-bold')}>{full_name}</h1>

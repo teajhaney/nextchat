@@ -13,17 +13,20 @@ export const SingleChat = () => {
   const { user, userData } = useAuthStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+  }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    const sentMessage = messages[messages.length - 1];
 
-	useEffect(() => {
+    // Only scroll if  message is sent by the current user
+    if (sentMessage?.sender_id === user?.id) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [messages, user?.id]);
 
+  useEffect(() => {
     if (selectedChatUser) {
       fetchMessages(selectedChatUser.id);
       subscribeToMessages();
@@ -34,7 +37,7 @@ export const SingleChat = () => {
     return (
       <div className="center-col items-center justify-center p-8">
         <LoadingSpinner className="size-6 border-2 border-primary border-dashed" />
-        <span className="ml-2 text-primary">Loading messages...</span>
+        <span className="ml-2 text-primary/50">Loading messages...</span>
       </div>
     );
   }

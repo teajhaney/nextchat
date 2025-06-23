@@ -64,3 +64,12 @@ body {
 input[type='checkbox'] {
   accent-color: var(--color-primary);
 }
+
+/* Add to global styles if using Tailwind CSS */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}

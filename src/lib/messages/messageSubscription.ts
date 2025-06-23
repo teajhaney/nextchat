@@ -24,7 +24,7 @@ export const subscribeToMessages = async (
 
   channel = supabase.channel(`messages:${user.id}:${otherUserId}`);
 
-  channel
+  channel 
     .on(
       'postgres_changes',
       {
