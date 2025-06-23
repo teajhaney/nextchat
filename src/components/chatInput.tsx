@@ -23,9 +23,9 @@ export const ChatInput = () => {
   const { sendMessage, subscribeToMessages } = useMessageStore();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    form.reset();
     await sendMessage(values.message);
     subscribeToMessages();
-    form.reset();
   };
 
   return (

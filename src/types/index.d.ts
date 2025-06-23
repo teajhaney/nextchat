@@ -41,6 +41,7 @@ declare interface MessageState {
   addMessage: (message: Message) => void;
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
+ 
 }
 
 // Tmessage data 
@@ -53,3 +54,6 @@ declare interface Message {
   is_read: boolean;
   isPending?: boolean;
 }
+
+
+
