@@ -6,6 +6,9 @@ import { supabase } from '@/lib/supabase/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthStore } from './authStore';
 
+
+
+
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
   selectedChatUser: null,
@@ -32,7 +35,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     get().fetchMessages(user.id);
     get().subscribeToMessages();
   },
-  //fetch messages for the selected user
+  //FETCH messages for the selected user
   fetchMessages: async otherUserId => {
     const { selectedChatUser } = get();
 
@@ -53,43 +56,8 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       console.error('Failed to fetch messages:', error);
     }
   },
-  //fetch messages for the selected user-- another approach which gives each fech a unique id.
-  //   fetchMessages: async otherUserId => {
-  //     const { selectedChatUser } = get();
 
-  //     // Ensure we're still on the same chat (prevent race conditions)
-  //     if (!selectedChatUser || selectedChatUser.id !== otherUserId) {
-  //       return;
-  //     }
-
-  //     // If no fetchId provided, generate one (for backwards compatibility)
-
-  //     const fetchId = uuidv4();
-  //     set({ currentFetchId: fetchId });
-
-  //     try {
-  //       const messages = await fetchMessages(otherUserId);
-
-  //       // Double-check: only update if this is still the current fetch and current user
-  //       const currentState = get();
-  //       if (
-  //         currentState.selectedChatUser?.id === otherUserId &&
-  //         currentState.currentFetchId === fetchId
-  //       ) {
-  //         set({ messages, isLoading: false });
-  //       }
-  //       // If this is not the current fetch, just ignore the results
-  //     } catch (error) {
-  //       console.error('Failed to fetch messages:', error);
-  //       // Only update loading state if this is still the current fetch
-  //       const currentState = get();
-  //       if (currentState.currentFetchId === fetchId) {
-  //         set({ isLoading: false });
-  //       }
-  //     }
-  //   },
-
-  //send message to the selected user
+  //SEND message to the selected user
   sendMessage: async content => {
     const { selectedChatUser, messages } = get();
     if (!selectedChatUser) return;
@@ -132,7 +100,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     }
   },
 
-  //add message to the store
+  //ADD message to the store
   addMessage: message => {
     const { messages, selectedChatUser } = get();
     if (!selectedChatUser) return;
@@ -153,7 +121,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     }
   },
 
-  //subscribe to messages for the selected user
+  //SUBSCRIBE to messages for the selected user
   subscribeToMessages: async () => {
     const { selectedChatUser, addMessage } = get();
 
@@ -161,7 +129,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     set({ subscription }); // Optional: store subscription if needed for cleanup
   },
 
-  //unsubscribe from messages
+  //UNSUBSCRIBE from messages
   unsubscribeFromMessages: async () => {
     const { subscription } = get();
     if (subscription) {
@@ -172,3 +140,41 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     // supabase.removeAllChannels();
   },
 }));
+
+
+
+  //fetch messages for the selected user-- another approach which gives each fech a unique id.
+  //   fetchMessages: async otherUserId => {
+  //     const { selectedChatUser } = get();
+
+  //     // Ensure we're still on the same chat (prevent race conditions)
+  //     if (!selectedChatUser || selectedChatUser.id !== otherUserId) {
+  //       return;
+  //     }
+
+  //     // If no fetchId provided, generate one (for backwards compatibility)
+
+  //     const fetchId = uuidv4();
+  //     set({ currentFetchId: fetchId });
+
+  //     try {
+  //       const messages = await fetchMessages(otherUserId);
+
+  //       // Double-check: only update if this is still the current fetch and current user
+  //       const currentState = get();
+  //       if (
+  //         currentState.selectedChatUser?.id === otherUserId &&
+  //         currentState.currentFetchId === fetchId
+  //       ) {
+  //         set({ messages, isLoading: false });
+  //       }
+  //       // If this is not the current fetch, just ignore the results
+  //     } catch (error) {
+  //       console.error('Failed to fetch messages:', error);
+  //       // Only update loading state if this is still the current fetch
+  //       const currentState = get();
+  //       if (currentState.currentFetchId === fetchId) {
+  //         set({ isLoading: false });
+  //       }
+  //     }
+  //   },
