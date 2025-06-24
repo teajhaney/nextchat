@@ -1,9 +1,8 @@
 'use server';
 
-import { supabase } from '@/lib/supabase/supabase';
-import { supabaseServer } from '../supabase/server';
+import { supabase } from '@/supabase/supabase';
+import { supabaseServer } from '../../supabase/server';
 import { Message } from '@/types/index';
-
 
 //FETCH MESSAGES
 export const fetchMessages = async (otherUserId: string): Promise<Message[]> => {
@@ -26,15 +25,14 @@ export const fetchMessages = async (otherUserId: string): Promise<Message[]> => 
   return data;
 };
 
-
 //SEND MESSAGES
 export const sendMessage = async (recipientId: string, content: string): Promise<Message> => {
   const supabase = await supabaseServer();
   const {
     data: { user },
-  } = await supabase.auth.getUser(); 
+  } = await supabase.auth.getUser();
 
-  if (!user) throw new Error('No user'); 
+  if (!user) throw new Error('No user');
 
   const { data, error } = await supabase
     .from('messages')
@@ -46,8 +44,6 @@ export const sendMessage = async (recipientId: string, content: string): Promise
   return data;
 };
 
-
-
 //MARK MESSAGES AS READ
 export const markMessagesAsRead = async (messageIds: string[]) => {
   try {
@@ -57,7 +53,7 @@ export const markMessagesAsRead = async (messageIds: string[]) => {
       .in('id', messageIds);
 
     if (error) throw error;
-    
+
     return { success: true };
   } catch (error) {
     console.error('Error marking messages as read:', error);
@@ -80,7 +76,7 @@ export const markConversationAsRead = async (otherUserId: string, currentUserId:
       .eq('is_read', false);
 
     if (error) throw error;
-    
+
     return { success: true };
   } catch (error) {
     console.error('Error marking conversation as read:', error);

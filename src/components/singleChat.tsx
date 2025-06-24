@@ -20,27 +20,16 @@ export const SingleChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
   }, [messages]);
 
   useEffect(() => {
-    const sentMessage = messages[messages.length - 1];
-
-    // Only scroll if  message is sent by the current user
-    if (sentMessage?.sender_id === user?.id) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-    }
-  }, [messages, user?.id]);
-
-  useEffect(() => {
     if (selectedChatUser) {
-      fetchMessages(selectedChatUser.id);
       subscribeToMessages();
+      fetchMessages(selectedChatUser.id);
       clearOldMessages();
     }
-  }, [selectedChatUser, fetchMessages, subscribeToMessages, clearOldMessages]);
+  }, [selectedChatUser, fetchMessages, subscribeToMessages, clearOldMessages, user]);
 
   if (isLoading) {
     return (
@@ -89,14 +78,6 @@ export const SingleChat = () => {
 
                 {/* Only showing check marks for own messages */}
                 {isOwnMessage && (
-                  //   <div>
-                  //     {message.isPending ? (
-                  //       <Check className="size-4 text-primary" />
-                  //     ) : (
-                  //       <CheckCheck className="size-4 text-primary font-bold" />
-                  //     )}
-                  //   </div>
-
                   <ReadReceipt
                     isRead={message.is_read}
                     isSentByCurrentUser={isOwnMessage}

@@ -1,7 +1,7 @@
 'use client';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { Message } from '@/types/index';
-import { supabaseBrowser } from '../supabase/browser';
+import { supabaseBrowser } from '../../supabase/browser';
 
 let channel: RealtimeChannel | null = null;
 
@@ -24,7 +24,7 @@ export const subscribeToMessages = async (
 
   channel = supabase.channel(`messages:${user.id}:${otherUserId}`);
 
-  channel 
+  channel
     .on(
       'postgres_changes',
       {

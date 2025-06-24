@@ -1,4 +1,4 @@
-import { User, RealtimeChannel } from '@/lib/supabase/supabase';
+import { User, RealtimeChannel } from '@/supabase/supabase';
 
 declare interface AuthState {
   user: User | null;
@@ -44,6 +44,8 @@ declare interface MessageState {
   addMessage: (message: Message) => void;
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
+  // markConversationAsRead: (otherUserId: string) => Promise<void>;
+  //   markMessageAsRead: (messageId: string) => void;
 
   //  cache management methods
   clearMessageCache: () => void;

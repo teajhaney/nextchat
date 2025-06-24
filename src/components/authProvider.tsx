@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/app/store/authStore';
-import { supabaseBrowser } from '@/lib/supabase/browser';
+import { supabaseBrowser } from '@/supabase/browser';
 import { FullScreenLoader } from '@/components';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
