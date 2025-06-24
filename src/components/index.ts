@@ -1,3 +1,4 @@
+
 export { LoadingSpinner } from './loadingSpinner';
 export { Sidebar } from './sidebar';
 export { ChatListBar } from './chatListBar';
@@ -14,6 +15,7 @@ export { ChatInput } from './chatInput';
 export { Chats } from './chats';
 export { SingleChat } from './singleChat';
 export { GroupChats } from './groupChats';
+export { ReadReceipt } from './readReceipt';
 
 //shadcn component
 export { Button } from './ui/button';

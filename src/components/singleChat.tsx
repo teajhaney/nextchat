@@ -3,19 +3,27 @@ import React, { Suspense, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useMessageStore } from '@/app/store/messageStore';
 import { useAuthStore } from '@/app/store/authStore';
-import { Check, CheckCheck } from 'lucide-react';
-import { LoadingSpinner } from '@/components';
+// import { Check, CheckCheck } from 'lucide-react';
+import { LoadingSpinner, ReadReceipt } from '@/components';
 
 export const SingleChat = () => {
-  const { messages, selectedChatUser, fetchMessages, isLoading, subscribeToMessages } =
-    useMessageStore();
+  const {
+    messages,
+    selectedChatUser,
+    fetchMessages,
+    isLoading,
+    subscribeToMessages,
+    clearOldMessages,
+  } = useMessageStore();
 
   const { user, userData } = useAuthStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, []);
+    if (messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [messages]);
 
   useEffect(() => {
     const sentMessage = messages[messages.length - 1];
@@ -30,8 +38,9 @@ export const SingleChat = () => {
     if (selectedChatUser) {
       fetchMessages(selectedChatUser.id);
       subscribeToMessages();
+      clearOldMessages();
     }
-  }, [selectedChatUser, fetchMessages, subscribeToMessages]);
+  }, [selectedChatUser, fetchMessages, subscribeToMessages, clearOldMessages]);
 
   if (isLoading) {
     return (
@@ -80,13 +89,19 @@ export const SingleChat = () => {
 
                 {/* Only showing check marks for own messages */}
                 {isOwnMessage && (
-                  <div>
-                    {message.isPending ? (
-                      <Check className="size-4 text-primary" />
-                    ) : (
-                      <CheckCheck className="size-4 text-primary font-bold" />
-                    )}
-                  </div>
+                  //   <div>
+                  //     {message.isPending ? (
+                  //       <Check className="size-4 text-primary" />
+                  //     ) : (
+                  //       <CheckCheck className="size-4 text-primary font-bold" />
+                  //     )}
+                  //   </div>
+
+                  <ReadReceipt
+                    isRead={message.is_read}
+                    isSentByCurrentUser={isOwnMessage}
+                    isPending={message.isPending}
+                  />
                 )}
               </div>
             </div>

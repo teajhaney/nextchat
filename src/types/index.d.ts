@@ -37,13 +37,17 @@ declare interface MessageState {
   selectedChatUser: Profile | null;
   subscription: RealtimeChannel | null;
   currentChatUserId: string | null;
-  currentFetchId: string | null;
+  //   currentFetchId: string | null;
   setSelectedChatUser: (user: Profile) => void;
   fetchMessages: (otherUserId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
   addMessage: (message: Message) => void;
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
+
+  //  cache management methods
+  clearMessageCache: () => void;
+  clearOldMessages: () => void;
 }
 
 // Tmessage data
