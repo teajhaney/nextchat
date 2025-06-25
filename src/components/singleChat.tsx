@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useMessageStore } from '@/app/store/messageStore';
@@ -23,18 +24,39 @@ export const SingleChat = () => {
   const visibilityCheckTimeoutRef = useRef<NodeJS.Timeout>(null);
   const prevMessagesLengthRef = useRef<number>(0);
 
-  // Scroll to bottom on initial load or new message
+  // SCROLL to bottom on initial load or new message
+
   useEffect(() => {
-    if (messages.length === 0) return;
+    if (messages.length === 0 || !messagesEndRef.current) return;
 
     const sentMessage = messages[messages.length - 1];
     const isOwnMessage = sentMessage?.sender_id === user?.id;
 
+    // Check if this is a new message (not initial load)
+    const isNewMessage = messages.length > prevMessagesLengthRef.current;
+    prevMessagesLengthRef.current = messages.length;
+
+    // Always scroll to bottom on initial load
     if (isInitialLoad || isOwnMessage) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-      if (isInitialLoad) setIsInitialLoad(false);
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+      setIsInitialLoad(false);
+      return;
     }
-  }, [messages, user?.id, isInitialLoad]);
+
+    // For new messages, scroll smoothly to bottom
+    if (isNewMessage) {
+      // Check if user is near bottom (within 200px) before scrolling
+      const container = chatContainerRef.current;
+      if (container) {
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
+
+        if (distanceFromBottom < 500) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
+  }, [messages, isInitialLoad, user.id]);
 
   // Check message visibility when scrolling, resizing, or when new messages arrive
   useEffect(() => {
@@ -176,7 +198,3 @@ export const SingleChat = () => {
     </div>
   );
 };
-
-
-
-
