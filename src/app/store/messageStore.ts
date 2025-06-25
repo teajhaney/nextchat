@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { fetchMessages, sendMessage } from '@/lib/messages/messageService';
 import { subscribeToMessages } from '@/lib/messages/messageSubscription';
 import { Message, MessageState } from '@/types/index';
-import { supabase } from '@/supabase/supabase';
+import { supabase } from '@/lib/supabase/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { useAuthStore } from './authStore';
 import {
@@ -24,25 +24,22 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   setSelectedChatUser: async otherUser => {
     const { subscription, unsubscribeFromMessages, currentChatUserId } = get();
     if (otherUser.id === currentChatUserId) return;
-
     const { user: currentUser } = useAuthStore.getState();
     if (!currentUser) return;
-
     // Load cached messages immediately from local storage
     const cachedMessages = getStoredMessages(currentUser.id, otherUser.id);
-
+    const { otherUserData } = useAuthStore.getState();
+    const liveUser = otherUserData.find(u => u.id === otherUser.id);
     set({
       isLoading: cachedMessages.length === 0,
-      selectedChatUser: otherUser,
+      selectedChatUser: liveUser || otherUser,
       currentChatUserId: otherUser.id,
       messages: cachedMessages,
     });
-
     // Unsubscribe from previous chat
     if (subscription) {
       unsubscribeFromMessages();
     }
-
     // fetch fresh messages and subscribe
     get().fetchMessages(otherUser.id);
     get().subscribeToMessages();
@@ -59,18 +56,14 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
     try {
       const serverMessages = await fetchMessages(otherUserId);
-
       // Double check if selected chat has not changed during async call
       const currentChatUser = get().selectedChatUser;
-
       if (currentChatUser?.id === otherUserId) {
         const currentMessages = get().messages;
-
         // Separate optimistic messages (those with temp IDs or isPending flag)
         const optimisticMessages = currentMessages.filter(
           msg => msg.id.startsWith('temp-') || msg.isPending
         );
-
         // Merge server messages with optimistic messages
         // Server messages come first, then optimistic messages at the end
         const mergedMessages = [...serverMessages, ...optimisticMessages];
@@ -82,7 +75,6 @@ export const useMessageStore = create<MessageState>((set, get) => ({
             currentMessages.length > optimisticMessages.length &&
             serverMessages[serverMessages.length - 1].id !==
               currentMessages[currentMessages.length - optimisticMessages.length - 1]?.id);
-
         if (serverMessagesChanged || optimisticMessages.length > 0) {
           set({ messages: mergedMessages, isLoading: false });
 
@@ -181,7 +173,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     }
   },
 
-  //UPDATE message in the store 
+  //UPDATE message in the store
   updateMessage: (updatedMessage: Message) => {
     const { messages, selectedChatUser } = get();
     if (!selectedChatUser) return;
@@ -208,13 +200,13 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     }
   },
 
-  //SUBSCRIBE to messages for the selected user 
+  //SUBSCRIBE to messages for the selected user
   subscribeToMessages: async () => {
     const { selectedChatUser, addMessage, updateMessage } = get();
-
+    if (!selectedChatUser) return;
     const subscription = await subscribeToMessages(
-      selectedChatUser.id,
-      addMessage, 
+      selectedChatUser?.id,
+      addMessage,
       updateMessage // callback for message updates (read receipts)
     );
     set({ subscription });

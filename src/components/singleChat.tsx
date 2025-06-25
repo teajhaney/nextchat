@@ -168,7 +168,13 @@ export const SingleChat = () => {
               isOwnMessage ? 'flex-row-reverse items-end' : ''
             }`}
           >
-            <Image src={avatar} alt="User Avatar" width={40} height={40} className="rounded-full" />
+            <Image
+              src={avatar || '/images/google.svg'}
+              alt="User Avatar"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
             <div
               className={`relative text-sm p-2 shadow rounded-b-lg max-w-10/12 ${
                 isOwnMessage ? 'bg-primary/20 rounded-tl-lg' : 'rounded-tr-lg bg-gray100'

@@ -30,24 +30,24 @@ async function updateSession(request: NextRequest) {
   );
 
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (user && request.nextUrl.pathname === '/') {
+  if (session && request.nextUrl.pathname === '/') {
     const url = request.nextUrl.clone();
     url.pathname = '/chat';
     return NextResponse.redirect(url);
   }
 
   ////
-  if (!user && request.nextUrl.pathname === '/chat') {
+  if (!session && request.nextUrl.pathname === '/chat') {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
   }
 
   if (
-    !user &&
+    !session &&
     !request.nextUrl.pathname.startsWith('/') &&
     !request.nextUrl.pathname.startsWith('/auth/callback')
   ) {
@@ -63,3 +63,6 @@ async function updateSession(request: NextRequest) {
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 };
+
+
+

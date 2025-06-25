@@ -1,6 +1,6 @@
 'use server';
 
-import { supabaseServer } from '../../supabase/server';
+import { supabaseServer } from '../supabase/server';
 import { Message } from '@/types/index';
 
 //FETCH MESSAGES
@@ -42,7 +42,3 @@ export const sendMessage = async (recipientId: string, content: string): Promise
   if (error) throw new Error(error.message);
   return data;
 };
-
-
-
-

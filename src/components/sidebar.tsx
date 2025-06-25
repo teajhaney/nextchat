@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { MessageSquareDot } from 'lucide-react';
+import { LogOut, MessageSquareDot } from 'lucide-react';
 import { avatarUrl, sidebarItems } from '@/constants';
 import { ChatListBar, SettingsBar } from '@/components';
 import clsx from 'clsx';
@@ -13,7 +13,6 @@ export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
   const { userData } = useAuthStore(state => state);
 
-  //
   useEffect(() => {
     gsap.fromTo(
       '.secondary-sidebar',
@@ -49,14 +48,17 @@ export const Sidebar = () => {
             </div>
           ))}
         </div>
-        <div>
-          <Image
-            src={userData?.avatar_url || avatarUrl}
-            alt={userData?.full_name || 'logged in user image'}
-            width={24}
-            height={24}
-            className="h-auto w-auto rounded-full"
-          />
+        <div className="flex flex-col items-center gap-2">
+          <LogOut className="text-red-600 cursor-pointer" />
+          <div>
+            <Image
+              src={userData?.avatar_url || avatarUrl}
+              alt={userData?.full_name || 'logged in user image'}
+              width={24}
+              height={24}
+              className="h-auto w-auto rounded-full"
+            />
+          </div>
         </div>
       </aside>
       {/* Secondary Sidebar */}

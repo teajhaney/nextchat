@@ -1,4 +1,4 @@
-import { supabaseBrowser } from '../../supabase/browser';
+import { supabaseBrowser } from '../supabase/browser';
 
 //google sign in
 export const googleSignin = async () => {

@@ -1,4 +1,4 @@
-import { User, RealtimeChannel } from '@/supabase/supabase';
+import { User, RealtimeChannel } from '@/lib/supabase/supabase';
 
 declare interface AuthState {
   user: User | null;
@@ -14,6 +14,8 @@ declare interface AuthState {
   setGoogleLoading: (loading: boolean) => void;
   setAuthError: (error: string | null) => void;
   clearAuth: () => void;
+
+
 }
 
 declare interface UserData {
@@ -21,6 +23,7 @@ declare interface UserData {
   full_name: string;
   email: string;
   avatar_url?: string;
+
 }
 
 //profile data which includes the user
@@ -29,12 +32,14 @@ declare interface ProfileData {
   full_name: string;
   avatar_url?: string;
   email: string;
+//   is_online: boolean;
+//   last_seen: string;
 }
 
 declare interface MessageState {
   messages: Message[];
   isLoading: boolean;
-  selectedChatUser: Profile | null;
+  selectedChatUser: ProfileData | null;
   subscription: RealtimeChannel | null;
   currentChatUserId: string | null;
   setSelectedChatUser: (user: Profile) => void;
@@ -50,7 +55,9 @@ declare interface MessageState {
 
   //  cache management methods
   clearMessageCache: () => void;
-  clearOldMessages: () => void;
+	clearOldMessages: () => void;
+	
+
 }
 
 // Tmessage data

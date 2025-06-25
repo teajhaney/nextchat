@@ -14,12 +14,12 @@ export const ChatList = () => {
   }
   return (
     <div className="space-y-3">
-      {otherUserData.map(({ id, full_name, avatar_url, email }) => {
+      {otherUserData.map(({ id, full_name, avatar_url, email,  }) => {
         const selectedChat = selectedChatUser?.id === id;
         return (
           <div
             key={id}
-            onClick={() => setSelectedChatUser({ id, full_name, avatar_url, email })}
+            onClick={() => setSelectedChatUser({ id, full_name, avatar_url, email,  })}
             className={clsx(
               'p-3 flex justify-between items-center shadow rounded-sm cursor-pointer',
               selectedChat && 'border border-primary'
