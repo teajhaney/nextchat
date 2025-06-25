@@ -8,6 +8,7 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import Link from 'next/link';
 import { useAuthStore } from '@/app/store/authStore';
+import { logoutUser } from '@/lib/actions/supabase.actions';
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
@@ -20,6 +21,11 @@ export const Sidebar = () => {
       { opacity: 1, duration: 0.5, ease: 'power2.inOut' }
     );
   }, [activeItem]);
+
+  const handleLogout = () => {
+	  logoutUser();
+	
+  };
 
   return (
     <div className="flex h-screen">
@@ -49,7 +55,7 @@ export const Sidebar = () => {
           ))}
         </div>
         <div className="flex flex-col items-center gap-2">
-          <LogOut className="text-red-600 cursor-pointer" />
+          <LogOut className="text-red-600 cursor-pointer" onClick={handleLogout} />
           <div>
             <Image
               src={userData?.avatar_url || avatarUrl}
@@ -71,3 +77,6 @@ export const Sidebar = () => {
     </div>
   );
 };
+
+
+
