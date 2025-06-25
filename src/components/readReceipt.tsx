@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, CheckCheck } from 'lucide-react';
+import { Check, CheckCheck, Clock3 } from 'lucide-react';
 
 interface ReadReceiptProps {
   isRead: boolean;
@@ -18,7 +18,7 @@ export const ReadReceipt = ({
   if (isPending) {
     return (
       <div className="flex items-center justify-end mt-1">
-        <div className="size-2 bg-primary rounded-full animate-pulse" />
+        <Clock3 className="size-2 text-primary" />
       </div>
     );
   }
@@ -33,6 +33,3 @@ export const ReadReceipt = ({
     </div>
   );
 };
-
-
-
