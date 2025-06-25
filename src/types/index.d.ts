@@ -44,12 +44,16 @@ declare interface MessageState {
   addMessage: (message: Message) => void;
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
-  // markConversationAsRead: (otherUserId: string) => Promise<void>;
-  //   markMessageAsRead: (messageId: string) => void;
+
+  // Read receipt methods - ADD THESE
+  markMessagesAsRead: (messageIds: string[]) => Promise<void>;
+//   markConversationAsRead: () => Promise<void>;
 
   //  cache management methods
   clearMessageCache: () => void;
   clearOldMessages: () => void;
+
+  updateMessage: (message: Message) => void;
 }
 
 // Tmessage data
