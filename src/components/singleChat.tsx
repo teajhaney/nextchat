@@ -1,5 +1,5 @@
 'use client';
-import React, { Suspense, useEffect, useRef } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useMessageStore } from '@/app/store/messageStore';
 import { useAuthStore } from '@/app/store/authStore';
@@ -18,10 +18,25 @@ export const SingleChat = () => {
 
   const { user, userData } = useAuthStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [messages]);
+    if (messages.length === 0) return;
+
+    const sentMessage = messages[messages.length - 1];
+    const isOwnMessage = sentMessage?.sender_id === user?.id;
+
+    // Always scroll on initial load or when user sends a message
+    if (isInitialLoad || isOwnMessage) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      if (isInitialLoad) setIsInitialLoad(false);
+    }
+  }, [messages, user?.id, isInitialLoad]);
+
+  // Reset when switching chats
+  useEffect(() => {
+    setIsInitialLoad(true);
+  }, []);
 
   useEffect(() => {
     if (selectedChatUser) {
