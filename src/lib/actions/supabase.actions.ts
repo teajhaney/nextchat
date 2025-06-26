@@ -1,7 +1,7 @@
 'use client';
-import { supabase } from '../supabase/supabase';
+
 import { supabaseBrowser } from '../supabase/browser';
-import { useAuthStore } from '@/app/store/authStore';
+// import { useAuthStore } from '@/app/store/authStore';
 
 //google sign in
 export const googleSignin = async () => {
@@ -22,28 +22,3 @@ export const googleSignin = async () => {
   }
 };
 
-export const logoutUser = async () => {
-  try {
-    // Sign out from Supabase
-
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      console.error('Logout error:', error.message);
-      return false;
-    }
-
-    // Force redirect and reload to clear session
-    window.location.href = '/';
-
-    // Clear auth store
-    useAuthStore.getState().clearAuth();
-
-    sessionStorage.clear();
-
-    return true;
-  } catch (error) {
-    console.error('Logout failed:', error);
-    return false;
-  }
-};

@@ -34,11 +34,25 @@ async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
-			},
-		
+        },
       },
     }
   );
+
+  // Handle logout request
+  if (request.nextUrl.pathname === '/logout') {
+    await supabase.auth.signOut();
+    const response = NextResponse.redirect(new URL('/', request.url));
+    // Clear Supabase cookies
+    request.cookies.getAll().forEach(cookie => {
+      if (cookie.name.startsWith('sb-')) {
+        response.cookies.delete(cookie.name);
+      }
+    });
+    // Prevent caching
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
+  }
 
   const {
     data: { user },
@@ -60,3 +74,5 @@ async function updateSession(request: NextRequest) {
 
   return supabaseResponse;
 }
+
+

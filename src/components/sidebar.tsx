@@ -8,12 +8,13 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import Link from 'next/link';
 import { useAuthStore } from '@/app/store/authStore';
-import { logoutUser } from '@/lib/actions/supabase.actions';
+
 import { useRouter } from 'next/navigation';
+import { logoutUser } from '@/lib/actions/logout.action';
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
-  const { userData } = useAuthStore(state => state);
+  const { userData, clearAuth } = useAuthStore(state => state);
   const router = useRouter();
   useEffect(() => {
     gsap.fromTo(
@@ -23,12 +24,15 @@ export const Sidebar = () => {
     );
   }, [activeItem]);
 
-  const handleLogout = () => {
-    logoutUser();
-    router.replace('/');
-
-    if (localStorage.getItem('nextchat_auth')) {
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      clearAuth();
       localStorage.removeItem('nextchat_auth');
+      router.replace('/');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout error:', error);
     }
   };
 
