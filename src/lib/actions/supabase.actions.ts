@@ -1,5 +1,4 @@
-
-// import { useAuthStore } from '@/app/store/authStore';
+'use client';
 import { supabase } from '../supabase/supabase';
 import { supabaseBrowser } from '../supabase/browser';
 import { useAuthStore } from '@/app/store/authStore';
@@ -34,11 +33,13 @@ export const logoutUser = async () => {
       return false;
     }
 
+    // Force redirect and reload to clear session
+    window.location.href = '/';
+
     // Clear auth store
     useAuthStore.getState().clearAuth();
 
-    // Force redirect and reload to clear session
-    window.location.href = '/';
+    sessionStorage.clear();
 
     return true;
   } catch (error) {
@@ -46,8 +47,3 @@ export const logoutUser = async () => {
     return false;
   }
 };
-
-
-
-
-

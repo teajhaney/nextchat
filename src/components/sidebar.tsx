@@ -9,11 +9,12 @@ import gsap from 'gsap';
 import Link from 'next/link';
 import { useAuthStore } from '@/app/store/authStore';
 import { logoutUser } from '@/lib/actions/supabase.actions';
+import { useRouter } from 'next/navigation';
 
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
   const { userData } = useAuthStore(state => state);
-
+  const router = useRouter();
   useEffect(() => {
     gsap.fromTo(
       '.secondary-sidebar',
@@ -23,8 +24,12 @@ export const Sidebar = () => {
   }, [activeItem]);
 
   const handleLogout = () => {
-	  logoutUser();
-	
+    logoutUser();
+    router.replace('/');
+
+    if (localStorage.getItem('nextchat_auth')) {
+      localStorage.removeItem('nextchat_auth');
+    }
   };
 
   return (
@@ -77,6 +82,3 @@ export const Sidebar = () => {
     </div>
   );
 };
-
-
-
