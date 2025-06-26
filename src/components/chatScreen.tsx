@@ -8,12 +8,11 @@ export const ChatScreen = () => {
       <div>
         <ChatHeader />
       </div>
-      <div className="flex-1 bg-gray100 overflow-y-auto scrollbar-hide">
+      <div className="bg-gray100 flex-1 overflow-y-auto scrollbar-hide">
         <Chats />
       </div>
       {/* chat input */}
       <div className="p-5">
-        {' '}
         <ChatInput />
       </div>
     </div>

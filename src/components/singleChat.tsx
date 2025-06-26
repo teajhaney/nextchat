@@ -161,11 +161,7 @@ export const SingleChat = () => {
   }
 
   return (
-    <div
-      className="h-full overflow-y-auto scrollbar-hide"
-      ref={chatContainerRef}
-      style={{ maxHeight: 'calc(100vh - 200px)' }}
-    >
+    <div className=" " ref={chatContainerRef}>
       {messages.map(message => {
         const isOwnMessage = message.sender_id === user?.id;
         const avatar = isOwnMessage ? userData?.avatar_url : selectedChatUser?.avatar_url;
@@ -173,7 +169,7 @@ export const SingleChat = () => {
           <div
             key={message.id}
             data-message-id={message.id}
-            className={`flex items-start gap-2 mb-4 ${
+            className={`flex items-start gap-2 mb-2 ${
               isOwnMessage ? 'flex-row-reverse items-end' : ''
             }`}
           >
@@ -209,7 +205,7 @@ export const SingleChat = () => {
           </div>
         );
       })}
-      <div ref={messagesEndRef} />
+      <div ref={messagesEndRef} className="h-0" />
     </div>
   );
 };

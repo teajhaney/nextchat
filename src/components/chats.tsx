@@ -18,7 +18,7 @@ export const Chats = () => {
     }
   }, [selectedChatUser]);
   return (
-    <main ref={chatsRef} className=" p-2">
+    <main ref={chatsRef} className=" p-2 ">
       <SingleChat />
     </main>
   );
