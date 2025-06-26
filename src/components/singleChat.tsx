@@ -21,8 +21,8 @@ export const SingleChat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const visibilityCheckTimeoutRef = useRef<NodeJS.Timeout>(null);
   const prevMessagesLengthRef = useRef<number>(0);
+  const visibilityCheckTimeoutRef = useRef<NodeJS.Timeout>(null);
 
   // SCROLL to bottom on initial load or new message
 
@@ -58,7 +58,7 @@ export const SingleChat = () => {
     }
   }, [messages, isInitialLoad, user.id]);
 
-  // Check message visibility when scrolling, resizing, or when new messages arrive
+  // CHECK message visibility when scrolling, resizing, or when new messages arrive
   useEffect(() => {
     const container = chatContainerRef.current;
     if (!container || !selectedChatUser || !user) return;
@@ -124,6 +124,15 @@ export const SingleChat = () => {
       }
     };
   }, [messages, user, selectedChatUser, markMessagesAsRead]);
+
+  // Initial setup
+  useEffect(() => {
+    if (selectedChatUser) {
+      subscribeToMessages();
+      fetchMessages(selectedChatUser.id);
+      clearOldMessages();
+    }
+  }, [selectedChatUser, fetchMessages, subscribeToMessages, clearOldMessages, user]);
 
   // Initial setup
   useEffect(() => {
@@ -204,7 +213,3 @@ export const SingleChat = () => {
     </div>
   );
 };
-
-
-
-

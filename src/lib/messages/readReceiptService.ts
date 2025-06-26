@@ -1,3 +1,4 @@
+'use client';
 import { supabaseBrowser } from '../supabase/browser'; // Use browser client
 
 //MARK MESSAGES AS READ (client-side to trigger real-time updates)

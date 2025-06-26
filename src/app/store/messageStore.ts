@@ -256,6 +256,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     } catch (error) {
       console.error('Failed to mark messages as read:', error);
       // Don't revert here - we'll get the correct state on next fetch
+      get().fetchMessages(selectedChatUser.id);
     }
   },
 }));
@@ -264,3 +265,6 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 if (typeof window !== 'undefined') {
   clearOldMessages();
 }
+
+
+
