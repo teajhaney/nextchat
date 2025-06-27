@@ -1,7 +1,7 @@
 'use client';
 import { create } from 'zustand';
-import { fetchMessages, sendMessage } from '@/lib/messages/messageService';
-import { subscribeToMessages } from '@/lib/messages/messageSubscription';
+import { fetchMessages, sendMessage } from '@/lib/services/messageService';
+import { subscribeToMessages } from '@/lib/services/messageSubscription';
 import { Message, MessageState } from '@/types/index';
 import { supabase } from '@/lib/supabase/supabase';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,7 +12,7 @@ import {
   STORAGE_KEY,
   storeMessages,
 } from '@/lib/storage/localMessageStorage';
-import { markMessagesAsRead } from '@/lib/messages/readReceiptService';
+import { markMessagesAsRead } from '@/lib/services/readReceiptService';
 
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
