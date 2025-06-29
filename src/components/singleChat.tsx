@@ -125,16 +125,7 @@ export const SingleChat = () => {
     };
   }, [messages, user, selectedChatUser, markMessagesAsRead]);
 
-  // Initial setup
-  useEffect(() => {
-    if (selectedChatUser) {
-      subscribeToMessages();
-      fetchMessages(selectedChatUser.id);
-      clearOldMessages();
-    }
-  }, [selectedChatUser, fetchMessages, subscribeToMessages, clearOldMessages, user]);
-
-  // Initial setup
+  // Message setup
   useEffect(() => {
     if (selectedChatUser) {
       subscribeToMessages();
