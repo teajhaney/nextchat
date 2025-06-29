@@ -13,7 +13,7 @@ export const ChatList = () => {
     return <p>No other users found.</p>;
   }
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 ">
       {otherUserData.map(({ id, full_name, avatar_url, email,  }) => {
         const selectedChat = selectedChatUser?.id === id;
         return (

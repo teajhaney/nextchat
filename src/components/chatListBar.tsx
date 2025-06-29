@@ -15,7 +15,7 @@ export const ChatListBar = () => {
     );
 
   return (
-    <aside className="px-3 pt-5 space-y-5">
+    <aside className="px-3 pt-5 space-y-5 h-full overflow-y-auto scrollbar-hide">
       {/* header */}
       <div className="space-y-2">
         <div className="flex justify-between items-center">
@@ -47,7 +47,7 @@ export const ChatListBar = () => {
           <FunnelPlus className="text-primary size-5" />
         </div>
       </div>
-      <div className="py-2">
+      <div className="py-2 h-ful">
         <ChatList />
       </div>
     </aside>
