@@ -2,13 +2,7 @@
 import { useAuthStore } from '@/app/store/authStore';
 import React from 'react';
 import { Input, LoadingSpinner, ChatList, RecentChats } from '@/components';
-import { CirclePlus, FunnelPlus, } from 'lucide-react';
-
-const App = () => {
-  return <CirclePlus />;
-};
-
-export default App;
+import { CirclePlus, FunnelPlus } from 'lucide-react';
 
 export const ChatListBar = () => {
   const { loading } = useAuthStore(state => state);
@@ -37,15 +31,14 @@ export const ChatListBar = () => {
             placeholder="Search for messages or contacts"
             className="px-2 border-none focus:border-none focus:outline-none shadow w-full"
           />
-        
         </div>
       </div>
       {/* recent chat */}
       <div className="flex flex-col gap-2">
         <h1 className="font-bold">Recent chat</h1>
-			  <div className="">
-				  <RecentChats  />
-		</div>
+        <div className="">
+          <RecentChats />
+        </div>
       </div>
       {/* chat header */}
       <div className="flex justify-between items-center">

@@ -37,7 +37,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen max-lg:w-full">
       {/* Primary Sidebar */}
       <aside className=" h-screen w-20  border-r border-r-primary bg-background px-2 py-5 flex flex-col  items-center gap-10">
         <div className="flex flex-col items-center gap-5">
@@ -77,7 +77,7 @@ export const Sidebar = () => {
         </div>
       </aside>
       {/* Secondary Sidebar */}
-      <aside className="h-screen w-96 border-r border-r-primary bg-background ">
+      <aside className="max-lg:w-full h-screen lg:w-96 lg:border-r border-r-primary bg-background ">
         <div className="secondary-sidebar w-full h-full">
           {activeItem === 'Chats' && <ChatListBar />}
           {activeItem === 'Settings' && <SettingsBar />}
@@ -86,3 +86,7 @@ export const Sidebar = () => {
     </div>
   );
 };
+
+
+
+

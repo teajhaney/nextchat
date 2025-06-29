@@ -10,7 +10,7 @@ const Chat = () => {
   return (
     <main className="">
       {selectedChatUser ? (
-        <div className="chat-screen">
+        <div className="chat-screen ">
           <ChatScreen />
         </div>
       ) : (
