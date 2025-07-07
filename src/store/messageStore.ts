@@ -138,6 +138,15 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       if (user) {
         storeMessages(user.id, selectedChatUser.id, updatedMessages);
       }
+      // Update lastMessages for this chat
+      set(state => {
+        const otherUserId = selectedChatUser.id;
+        const updatedLastMessages = [
+          ...state.lastMessages.filter(lm => lm.otherUserId !== otherUserId),
+          { otherUserId, lastMessage: message },
+        ];
+        return { lastMessages: updatedLastMessages };
+      });
     } catch (error) {
       // Remove optimistic message on failure, i.e set messages to evry other messages except the current message being sent
       const failedMessages = messages.filter(
@@ -156,7 +165,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
   //ADD message to the store
   addMessage: message => {
-    const { messages, selectedChatUser, lastMessages } = get();
+    const { messages, selectedChatUser, } = get();
     if (!selectedChatUser) return;
 
     // Check if message already exists (avoid duplicates)
@@ -180,34 +189,19 @@ export const useMessageStore = create<MessageState>((set, get) => ({
         storeMessages(user.id, selectedChatUser.id, newMessages);
       }
 
-      // Update last messages
-      const updatedLastMessages = lastMessages.map(lastMsg => {
-        if (lastMsg.otherUserId === selectedChatUser.id) {
-          return { ...lastMsg, lastMessage: message };
-        }
-        return lastMsg;
+      set(state => {
+        const otherUserId =
+          message.sender_id === user.id
+            ? message.recipient_id
+            : message.sender_id;
+        const updatedLastMessages = [
+          ...state.lastMessages.filter(lm => lm.otherUserId !== otherUserId),
+          { otherUserId, lastMessage: message },
+        ];
+        return { lastMessages: updatedLastMessages };
       });
-      set({ lastMessages: updatedLastMessages });
     }
-
-    if (isCurrentChat) {
-      const newMessages = [...messages, message];
-      set({ messages: newMessages });
-
-      // Update localStorage with new message
-      if (user) {
-        storeMessages(user.id, selectedChatUser.id, newMessages);
-      }
-
-      // Update last messages
-      const updatedLastMessages = lastMessages.map(lastMsg => {
-        if (lastMsg.otherUserId === selectedChatUser.id) {
-          return { ...lastMsg, lastMessage: message };
-        }
-        return lastMsg;
-      });
-      set({ lastMessages: updatedLastMessages });
-    }
+   
   },
 
   //UPDATE message in the store
