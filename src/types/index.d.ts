@@ -42,6 +42,7 @@ declare interface MessageState {
   selectedChatUser: ProfileData | null;
   subscription: RealtimeChannel | null;
   currentChatUserId: string | null;
+  lastMessages: LastMessage[];
   setSelectedChatUser: (user: Profile) => void;
   fetchMessages: (otherUserId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
@@ -49,14 +50,11 @@ declare interface MessageState {
   subscribeToMessages: () => void;
   unsubscribeFromMessages: () => void;
   updateMessage: (message: Message) => void;
-
-  // Read receipt methods - ADD THESE
+  fetchLastMessagesForAllChats: () => Promise<void>;
   markMessagesAsRead: (messageIds: string[]) => Promise<void>;
-
-  //  cache management methods
   clearMessageCache: () => void;
-	clearOldMessages: () => void;
-	
+  clearOldMessages: () => void;
+
 
 }
 
@@ -70,4 +68,9 @@ declare interface Message {
   is_read: boolean;
   isPending?: boolean;
   isLoading?: boolean;
+}
+
+declare interface LastMessage {
+  otherUserId: string;
+  lastMessage: Message | null;
 }
