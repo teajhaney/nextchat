@@ -165,7 +165,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
   //ADD message to the store
   addMessage: message => {
-    const { messages, selectedChatUser, } = get();
+    const { messages, selectedChatUser } = get();
     if (!selectedChatUser) return;
 
     // Check if message already exists (avoid duplicates)
@@ -201,7 +201,6 @@ export const useMessageStore = create<MessageState>((set, get) => ({
         return { lastMessages: updatedLastMessages };
       });
     }
-   
   },
 
   //UPDATE message in the store

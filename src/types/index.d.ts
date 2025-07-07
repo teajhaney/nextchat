@@ -14,8 +14,6 @@ declare interface AuthState {
   setGoogleLoading: (loading: boolean) => void;
   setAuthError: (error: string | null) => void;
   clearAuth: () => void;
-
-
 }
 
 declare interface UserData {
@@ -23,7 +21,6 @@ declare interface UserData {
   full_name: string;
   email: string;
   avatar_url?: string;
-
 }
 
 //profile data which includes the user
@@ -32,8 +29,8 @@ declare interface ProfileData {
   full_name: string;
   avatar_url?: string;
   email: string;
-//   is_online: boolean;
-//   last_seen: string;
+  //   is_online: boolean;
+  //   last_seen: string;
 }
 
 declare interface MessageState {
@@ -43,7 +40,7 @@ declare interface MessageState {
   subscription: RealtimeChannel | null;
   currentChatUserId: string | null;
   lastMessages: LastMessage[];
-  setSelectedChatUser: (user: Profile) => void;
+  setSelectedChatUser: (user: ProfileData) => void;
   fetchMessages: (otherUserId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
   addMessage: (message: Message) => void;
@@ -54,8 +51,6 @@ declare interface MessageState {
   markMessagesAsRead: (messageIds: string[]) => Promise<void>;
   clearMessageCache: () => void;
   clearOldMessages: () => void;
-
-
 }
 
 // Tmessage data
