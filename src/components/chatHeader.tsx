@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import Image from 'next/image';
 import { avatarUrl } from '@/constants';
 import { ChatOptions } from '@/components';
-import { useMessageStore } from '@/app/store/messageStore';
+import { useMessageStore } from '@/store/messageStore';
 
 export const ChatHeader = () => {
   const { selectedChatUser } = useMessageStore(state => state);

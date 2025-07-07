@@ -2,7 +2,7 @@
 
 import { ChatScreen, NoChatScreen } from '@/components';
 
-import { useMessageStore } from '@/app/store/messageStore';
+import { useMessageStore } from '@/store/messageStore';
 
 const Chat = () => {
   const { selectedChatUser } = useMessageStore(state => state);

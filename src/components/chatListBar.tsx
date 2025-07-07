@@ -1,5 +1,5 @@
 'use client';
-import { useAuthStore } from '@/app/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import React from 'react';
 import { Input, LoadingSpinner, ChatList, RecentChats } from '@/components';
 import { CirclePlus, FunnelPlus } from 'lucide-react';

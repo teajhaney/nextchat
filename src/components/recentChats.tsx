@@ -1,9 +1,9 @@
 'use client';
-import { useAuthStore } from '@/app/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import React from 'react';
 import Image from 'next/image';
 import { avatarUrl } from '@/constants';
-import { useMessageStore } from '@/app/store/messageStore';
+import { useMessageStore } from '@/store/messageStore';
 export const RecentChats = () => {
   const { otherUserData } = useAuthStore(state => state);
   const { setSelectedChatUser } = useMessageStore(state => state);
@@ -21,7 +21,9 @@ export const RecentChats = () => {
           <div
             key={id}
             className="flex flex-col items-center gap-2 cursor-pointer"
-            onClick={() => setSelectedChatUser({ id, full_name, avatar_url, email })}
+            onClick={() =>
+              setSelectedChatUser({ id, full_name, avatar_url, email })
+            }
           >
             <Image
               src={avatar_url || avatarUrl}

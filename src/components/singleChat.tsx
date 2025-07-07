@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { useMessageStore } from '@/app/store/messageStore';
-import { useAuthStore } from '@/app/store/authStore';
+import { useMessageStore } from '@/store/messageStore';
+import { useAuthStore } from '@/store/authStore';
 import { LoadingSpinner, ReadReceipt } from '@/components';
 
 export const SingleChat = () => {
@@ -132,7 +132,13 @@ export const SingleChat = () => {
       fetchMessages(selectedChatUser.id);
       clearOldMessages();
     }
-  }, [selectedChatUser, fetchMessages, subscribeToMessages, clearOldMessages, user]);
+  }, [
+    selectedChatUser,
+    fetchMessages,
+    subscribeToMessages,
+    clearOldMessages,
+    user,
+  ]);
 
   if (isLoading) {
     return (
@@ -155,7 +161,9 @@ export const SingleChat = () => {
     <div className=" " ref={chatContainerRef}>
       {messages.map(message => {
         const isOwnMessage = message.sender_id === user?.id;
-        const avatar = isOwnMessage ? userData?.avatar_url : selectedChatUser?.avatar_url;
+        const avatar = isOwnMessage
+          ? userData?.avatar_url
+          : selectedChatUser?.avatar_url;
         return (
           <div
             key={message.id}
@@ -173,7 +181,9 @@ export const SingleChat = () => {
             />
             <div
               className={`relative text-sm p-2 shadow rounded-b-lg max-w-10/12 ${
-                isOwnMessage ? 'bg-primary/20 rounded-tl-lg' : 'rounded-tr-lg bg-gray100'
+                isOwnMessage
+                  ? 'bg-primary/20 rounded-tl-lg'
+                  : 'rounded-tr-lg bg-gray100'
               }`}
             >
               <p className="text-gray-800">{message.content}</p>

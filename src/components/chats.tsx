@@ -1,5 +1,5 @@
 'use client';
-import { useMessageStore } from '@/app/store/messageStore';
+import { useMessageStore } from '@/store/messageStore';
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { SingleChat } from '@/components';

@@ -2,13 +2,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '@/app/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { supabaseBrowser } from '@/lib/supabase/browser';
 import { FullScreenLoader } from '@/components';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { setUser, clearAuth, setLoading, setUserData, setOtherUserData, setAuthError } =
-    useAuthStore();
+  const {
+    setUser,
+    clearAuth,
+    setLoading,
+    setUserData,
+    setOtherUserData,
+    setAuthError,
+  } = useAuthStore();
   const [isSessionChecked, setIsSessionChecked] = useState(false); // Track session check
   const LOCAL_STORAGE_KEY = 'nextchat_auth';
 
@@ -92,7 +98,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, [setUser, clearAuth, setLoading, setUserData, setOtherUserData, setAuthError]);
+  }, [
+    setUser,
+    clearAuth,
+    setLoading,
+    setUserData,
+    setOtherUserData,
+    setAuthError,
+  ]);
 
   if (!isSessionChecked) {
     return <FullScreenLoader />;

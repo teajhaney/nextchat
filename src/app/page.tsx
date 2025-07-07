@@ -3,14 +3,15 @@
 import { LoadingSpinner, Button } from '@/components';
 import { MessageSquareDot } from 'lucide-react';
 import Image from 'next/image';
-import { useAuthStore } from './store/authStore';
+import { useAuthStore } from '../store/authStore';
 import { googleSignin } from '@/lib/actions/supabase.actions';
 
 // import { useAuthStore } from './store/authStore';
 // import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const { authError, setGoogleLoading, googleLoading, setAuthError } = useAuthStore(state => state);
+  const { authError, setGoogleLoading, googleLoading, setAuthError } =
+    useAuthStore(state => state);
 
   //google
   const handleGoogleSignIn = async () => {
@@ -55,12 +56,16 @@ export default function Home() {
                 height={24}
                 className="h-auto w-auto"
               />
-              <p className="text-primary font-medium max-md:text-sm text-xl">Sign in with Google</p>
+              <p className="text-primary font-medium max-md:text-sm text-xl">
+                Sign in with Google
+              </p>
             </div>
           )}
         </Button>
         {/* Display  errors */}
-        {authError && <p className={errorStyles + ' text-center'}>{authError}</p>}
+        {authError && (
+          <p className={errorStyles + ' text-center'}>{authError}</p>
+        )}
       </div>
     </div>
   );

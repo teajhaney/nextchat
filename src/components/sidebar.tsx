@@ -7,7 +7,7 @@ import clsx from 'clsx';
 import Image from 'next/image';
 import gsap from 'gsap';
 import Link from 'next/link';
-import { useAuthStore } from '@/app/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 
 import { useRouter } from 'next/navigation';
 import { logoutUser } from '@/lib/actions/logout.action';
@@ -64,7 +64,10 @@ export const Sidebar = () => {
           ))}
         </div>
         <div className="flex flex-col items-center gap-2">
-          <LogOut className="text-red-600 cursor-pointer" onClick={handleLogout} />
+          <LogOut
+            className="text-red-600 cursor-pointer"
+            onClick={handleLogout}
+          />
           <div>
             <Image
               src={userData?.avatar_url || avatarUrl}
@@ -86,7 +89,3 @@ export const Sidebar = () => {
     </div>
   );
 };
-
-
-
-

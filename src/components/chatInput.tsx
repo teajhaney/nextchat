@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form';
-import { useMessageStore } from '@/app/store/messageStore';
+import { useMessageStore } from '@/store/messageStore';
 
 const formSchema = z.object({
   message: z.string().min(1),
