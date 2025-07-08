@@ -22,7 +22,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           opacity: 1,
           duration: 1,
           ease: 'power2.out',
-      
         }
       );
     } else {
@@ -31,7 +30,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         opacity: 0,
         duration: 1,
         ease: 'power2.in',
-      
       });
     }
   }, [selectedChatUser]);
