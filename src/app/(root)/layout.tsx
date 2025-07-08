@@ -1,24 +1,65 @@
 'use client';
 import { Sidebar } from '@/components';
 import { useMessageStore } from '@/store/messageStore';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { selectedChatUser } = useMessageStore(state => state);
+  const chatContentRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!chatContentRef.current) return;
+
+    if (selectedChatUser) {
+      // Slide chat content in from right
+      gsap.fromTo(
+        chatContentRef.current,
+        { opacity: 0 },
+        {
+          x: '0%',
+          opacity: 1,
+          duration: 1,
+          ease: 'power2.out',
+      
+        }
+      );
+    } else {
+      // Slide chat content out to right
+      gsap.to(chatContentRef.current, {
+        opacity: 0,
+        duration: 1,
+        ease: 'power2.in',
+      
+      });
+    }
+  }, [selectedChatUser]);
 
   return (
     <div className="text-textColor flex overflow-y-hidden relative">
       {/* Sidebar - always visible on large screens, hidden when chat is selected on small screens */}
-      <div className={selectedChatUser ? 'max-lg:hidden lg:block' : 'w-full'}>
+      <div
+        ref={sidebarRef}
+        className={
+          selectedChatUser ? 'max-lg:hidden lg:block' : 'max-lg:w-full'
+        }
+      >
         <Sidebar />
       </div>
 
       {/* Chat Content - slides over sidebar on small screens when chat is selected */}
       {selectedChatUser ? (
-        <div className="lg:flex-1  max-lg:inset-0 max-lg:z-10 max-lg:w-full">
+        <div
+          ref={chatContentRef}
+          className="lg:flex-1 max-lg:inset-0 max-lg:z-10 max-lg:w-full"
+        >
           {children}
         </div>
       ) : (
-        <div className="max-lg:hidden lg:flex-1">{children}</div>
+        <div className="max-lg:hidden lg:flex-1 lg:flex lg:items-center lg:justify-center">
+          {children}
+        </div>
       )}
     </div>
   );
