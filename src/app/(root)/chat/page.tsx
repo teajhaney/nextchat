@@ -8,7 +8,7 @@ const Chat = () => {
   const { selectedChatUser } = useMessageStore(state => state);
 
   return (
-    <main className="">
+    <main className="w-full">
       {selectedChatUser ? (
         <div className="chat-screen ">
           <ChatScreen />

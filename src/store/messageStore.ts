@@ -26,9 +26,25 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
   setSelectedChatUser: async otherUser => {
     const { subscription, unsubscribeFromMessages, currentChatUserId } = get();
+
+    // Handle null case - clear selected chat
+    if (!otherUser) {
+      if (subscription) {
+        unsubscribeFromMessages();
+      }
+      set({
+        selectedChatUser: null,
+        currentChatUserId: null,
+        messages: [],
+        isLoading: false,
+      });
+      return;
+    }
+
     if (otherUser.id === currentChatUserId) return;
     const { user: currentUser } = useAuthStore.getState();
     if (!currentUser) return;
+
     // Load cached messages immediately from local storage
     const cachedMessages = getStoredMessages(currentUser.id, otherUser.id);
     const { otherUserData } = useAuthStore.getState();
@@ -39,10 +55,12 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       currentChatUserId: otherUser.id,
       messages: cachedMessages,
     });
+
     // Unsubscribe from previous chat
     if (subscription) {
       unsubscribeFromMessages();
     }
+
     // fetch fresh messages and subscribe
     get().fetchMessages(otherUser.id);
     get().subscribeToMessages();

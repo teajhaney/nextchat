@@ -4,10 +4,13 @@ import gsap from 'gsap';
 import Image from 'next/image';
 import { avatarUrl } from '@/constants';
 import { ChatOptions } from '@/components';
+import { ArrowLeft } from 'lucide-react';
 import { useMessageStore } from '@/store/messageStore';
 
 export const ChatHeader = () => {
-  const { selectedChatUser } = useMessageStore(state => state);
+  const { selectedChatUser, setSelectedChatUser } = useMessageStore(
+    state => state
+  );
 
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -21,35 +24,17 @@ export const ChatHeader = () => {
     }
   }, [selectedChatUser]);
 
-  //   useEffect(() => {
-  //     const supabase = supabaseBrowser();
-  //     const channel = supabase.channel(`messages:${user?.id}${selectedChatUser?.id}`);
-  //     channel
-  //       .on('presence', { event: 'sync' }, () => {
-  //         console.log('Synced presence state: ', channel.presenceState());
-
-  //         const otherUserId = [];
-  //         for (const id in channel.presenceState()) {
-
-  //           otherUserId.push(channel.presenceState()[id][1]);
-
-  //           setIsOnline(otherUserId.length);
-  //         }
-  //       })
-  //       .subscribe(async status => {
-  //         if (status === 'SUBSCRIBED') {
-  //           await channel.track({
-  //             online_at: new Date().toISOString(),
-  //             user_id: selectedChatUser?.id,
-  //             email: selectedChatUser?.email,
-  //           });
-  //         }
-  //       });
-  //   }, [selectedChatUser, user]);
-
   return (
     <div className="p-3 flex justify-between items-center shadow rounded-sm cursor-pointer">
       <div className="chat-screen flex items-center gap-2" ref={headerRef}>
+        {/* Back button for mobile */}
+        <button
+          onClick={() => setSelectedChatUser(null)}
+          className="lg:hidden p-1 hover:bg-gray-100 rounded"
+        >
+          <ArrowLeft className="size-5 text-gray-600" />
+        </button>
+
         <Image
           src={selectedChatUser?.avatar_url || avatarUrl}
           alt={selectedChatUser?.full_name || 'user avatar'}

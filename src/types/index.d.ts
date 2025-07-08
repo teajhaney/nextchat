@@ -41,7 +41,7 @@ declare interface MessageState {
   currentChatUserId: string | null;
   lastMessages: LastMessage[];
   pendingReadReceipts: Set<string>;
-  setSelectedChatUser: (user: ProfileData) => void;
+  setSelectedChatUser: (user: ProfileData | null) => void;
   fetchMessages: (otherUserId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
   addMessage: (message: Message) => void;
