@@ -22,6 +22,7 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   subscription: null,
   currentChatUserId: null,
   lastMessages: [],
+  pendingReadReceipts: new Set<string>(),
 
   setSelectedChatUser: async otherUser => {
     const { subscription, unsubscribeFromMessages, currentChatUserId } = get();
@@ -205,10 +206,9 @@ export const useMessageStore = create<MessageState>((set, get) => ({
 
   //UPDATE message in the store
   updateMessage: (updatedMessage: Message) => {
-    const { messages, selectedChatUser } = get();
+    const { messages, selectedChatUser, pendingReadReceipts } = get();
     if (!selectedChatUser) return;
 
-    // Check if this message belongs to current chat
     const { user } = useAuthStore.getState();
     const isCurrentChat =
       (updatedMessage.sender_id === user.id &&
@@ -217,12 +217,47 @@ export const useMessageStore = create<MessageState>((set, get) => ({
         updatedMessage.recipient_id === user.id);
 
     if (isCurrentChat) {
+      // If the message is not found, store the read receipt for later
+      const messageExists = messages.some(msg => msg.id === updatedMessage.id);
+      if (!messageExists && updatedMessage.is_read) {
+        // Add to pendingReadReceipts
+        set(() => {
+          const newSet = new Set(pendingReadReceipts);
+          newSet.add(updatedMessage.id);
+          return { pendingReadReceipts: newSet };
+        });
+        return;
+      }
+
       // Find and update the specific message
-      const updatedMessages = messages.map(msg =>
-        msg.id === updatedMessage.id ? { ...msg, ...updatedMessage } : msg
-      );
+      const updatedMessages = messages.map(msg => {
+        // If this is the real message replacing an optimistic one, check pendingReadReceipts
+        if (
+          msg.id.startsWith('temp-') &&
+          updatedMessage.content === msg.content &&
+          updatedMessage.created_at === msg.created_at
+        ) {
+          // If we have a pending read receipt, set is_read: true
+          const isRead =
+            updatedMessage.is_read ||
+            get().pendingReadReceipts.has(updatedMessage.id);
+          return { ...updatedMessage, is_read: isRead };
+        }
+        return msg.id === updatedMessage.id
+          ? { ...msg, ...updatedMessage }
+          : msg;
+      });
 
       set({ messages: updatedMessages });
+
+      // Remove from pendingReadReceipts if present
+      if (get().pendingReadReceipts.has(updatedMessage.id)) {
+        set(() => {
+          const newSet = new Set(pendingReadReceipts);
+          newSet.delete(updatedMessage.id);
+          return { pendingReadReceipts: newSet };
+        });
+      }
 
       // Update localStorage
       if (user) {

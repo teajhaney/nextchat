@@ -40,6 +40,7 @@ declare interface MessageState {
   subscription: RealtimeChannel | null;
   currentChatUserId: string | null;
   lastMessages: LastMessage[];
+  pendingReadReceipts: Set<string>;
   setSelectedChatUser: (user: ProfileData) => void;
   fetchMessages: (otherUserId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;

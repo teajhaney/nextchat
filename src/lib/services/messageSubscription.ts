@@ -36,8 +36,10 @@ export const subscribeToMessages = async (
     payload => {
       const newMessage = payload.new as Message;
       const isParticipant =
-        (newMessage.sender_id === user.id && newMessage.recipient_id === otherUserId) ||
-        (newMessage.sender_id === otherUserId && newMessage.recipient_id === user.id);
+        (newMessage.sender_id === user.id &&
+          newMessage.recipient_id === otherUserId) ||
+        (newMessage.sender_id === otherUserId &&
+          newMessage.recipient_id === user.id);
 
       if (isParticipant) {
         onNewMessage(newMessage);
@@ -56,8 +58,10 @@ export const subscribeToMessages = async (
     payload => {
       const updatedMessage = payload.new as Message;
       const isParticipant =
-        (updatedMessage.sender_id === user.id && updatedMessage.recipient_id === otherUserId) ||
-        (updatedMessage.sender_id === otherUserId && updatedMessage.recipient_id === user.id);
+        (updatedMessage.sender_id === user.id &&
+          updatedMessage.recipient_id === otherUserId) ||
+        (updatedMessage.sender_id === otherUserId &&
+          updatedMessage.recipient_id === user.id);
 
       if (isParticipant) {
         onMessageUpdate(updatedMessage);
