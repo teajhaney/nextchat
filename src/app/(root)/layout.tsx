@@ -13,19 +13,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     if (!chatContentRef.current) return;
 
     if (selectedChatUser) {
-      // Slide chat content in from right
       gsap.fromTo(
         chatContentRef.current,
         { opacity: 0 },
         {
-          x: '0%',
           opacity: 1,
           duration: 1,
           ease: 'power2.out',
         }
       );
     } else {
-      // Slide chat content out to right
       gsap.to(chatContentRef.current, {
         opacity: 0,
         duration: 1,
