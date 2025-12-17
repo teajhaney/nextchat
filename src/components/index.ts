@@ -1,4 +1,4 @@
-export { LoadingSpinner } from './loadingSpinner';
+export { LoadingSpinner } from './LoadingSpinner';
 export { Sidebar } from './sidebar';
 export { ChatListBar } from './chatListBar';
 export { ChatList } from './chatList';

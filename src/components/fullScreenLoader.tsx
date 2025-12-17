@@ -1,4 +1,4 @@
-import { LoadingSpinner } from './loadingSpinner';
+import { LoadingSpinner } from './LoadingSpinner';
 
 export const FullScreenLoader = () => {
   return (
