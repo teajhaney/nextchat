@@ -445,10 +445,12 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     }
   },
 
+  // Clear old messages from localStorage
   clearOldMessages: () => {
     clearOldMessages();
   },
 
+  // MARK messages as read
   markMessagesAsRead: async (messageIds: string[]) => {
     const { messages, selectedChatUser } = get();
     if (!selectedChatUser || messageIds.length === 0) return;

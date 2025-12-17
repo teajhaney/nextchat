@@ -16,11 +16,12 @@ export { Chats } from './chats';
 export { SingleChat } from './singleChat';
 export { GroupChats } from './groupChats';
 export { ReadReceipt } from './readReceipt';
+export { AddUserDialog } from './addUserDialog';
 
 //shadcn component
 export { Button } from './ui/button';
 export { Input } from './ui/input';
-export { Textarea } from './textarea';
+export { Textarea } from './ui/textarea';
 export { Toaster } from './ui/sonner';
 export { toast } from 'sonner';
 export { Form } from './ui/form';

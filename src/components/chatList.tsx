@@ -100,20 +100,6 @@ export const ChatList = () => {
     );
   }
 
-  // Show loading skeleton while chat data is being fetched (prevents "no message yet" flash)
-  if (isChatDataLoading && lastMessages.length === 0) {
-    return (
-      <ChatListSkeleton
-        count={otherUserData.length}
-        showAvatar={true}
-        showTitle={true}
-        showSubtitle={true}
-        showTimestamp={true}
-        showBadge={false}
-      />
-    );
-  }
-
   const getLastMessage = (userId: string) => {
     const lastMessageData = lastMessages.find(lm => lm.otherUserId === userId);
     return lastMessageData?.lastMessage;
@@ -141,24 +127,52 @@ export const ChatList = () => {
     }
   };
 
+  // Show loading skeleton while chat data is being fetched (prevents "no message yet" flash)
+  if (isChatDataLoading && lastMessages.length === 0) {
+    return (
+      <ChatListSkeleton
+        count={otherUserData.length}
+        showAvatar={true}
+        showTitle={true}
+        showSubtitle={true}
+        showTimestamp={true}
+        showBadge={false}
+      />
+    );
+  }
+
+  // Filter to only show users who have messages (chats that have been started)
+  const usersWithMessages = otherUserData.filter(user => {
+    const lastMessage = getLastMessage(user.id);
+    return lastMessage !== undefined; // Only show users with messages
+  });
+
+  if (usersWithMessages.length === 0 && !isChatDataLoading) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p className="text-sm">No chats yet.</p>
+        <p className="text-xs mt-2">
+          Start a conversation by adding a new contact.
+        </p>
+      </div>
+    );
+  }
+
   // Sort chats by last message timestamp (most recent first)
-  // Chats with messages come first, then chats without messages
-  const sortedChats = [...otherUserData].sort((a, b) => {
+  const sortedChats = [...usersWithMessages].sort((a, b) => {
     const lastMessageA = getLastMessage(a.id);
     const lastMessageB = getLastMessage(b.id);
 
-    // If both have messages, sort by timestamp (newest first)
-    if (lastMessageA && lastMessageB) {
-      return (
-        new Date(lastMessageB.created_at).getTime() -
-        new Date(lastMessageA.created_at).getTime()
-      );
-    }
-    // If only one has a message, prioritize it
-    if (lastMessageA && !lastMessageB) return -1;
-    if (!lastMessageA && lastMessageB) return 1;
-    // If neither has messages, maintain original order
-    return 0;
+    // Both should have messages at this point, but handle edge cases
+    if (!lastMessageA && !lastMessageB) return 0;
+    if (!lastMessageA) return 1;
+    if (!lastMessageB) return -1;
+
+    // Sort by timestamp (newest first)
+    return (
+      new Date(lastMessageB.created_at).getTime() -
+      new Date(lastMessageA.created_at).getTime()
+    );
   });
 
   return (
