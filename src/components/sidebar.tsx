@@ -9,13 +9,9 @@ import gsap from 'gsap';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/authStore';
 
-import { useRouter } from 'next/navigation';
-import { logoutUser } from '@/lib/actions/logout.action';
-
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
-  const { userData, clearAuth } = useAuthStore(state => state);
-  const router = useRouter();
+  const { userData, user } = useAuthStore(state => state);
   useEffect(() => {
     gsap.fromTo(
       '.secondary-sidebar',
@@ -25,16 +21,20 @@ export const Sidebar = () => {
   }, [activeItem]);
 
   const handleLogout = async () => {
-    try {
-      await logoutUser();
-      clearAuth();
-      localStorage.removeItem('nextchat_auth');
-      router.replace('/');
-      router.refresh();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    // Navigate immediately without clearing state first - prevents showing data disappearing
+    // The middleware will handle signout and redirect, auth state will be cleared by auth state change listener
+    window.location.href = '/logout';
   };
+
+  const displayName =
+    userData?.full_name ||
+    userData?.email ||
+    user?.user_metadata?.full_name ||
+    user?.email ||
+    'You';
+
+  const displayAvatar =
+    userData?.avatar_url || user?.user_metadata?.avatar_url || avatarUrl;
 
   return (
     <div className="flex h-screen max-lg:w-full">
@@ -63,19 +63,22 @@ export const Sidebar = () => {
             </div>
           ))}
         </div>
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2 mt-auto pb-4">
           <LogOut
             className="text-red-600 cursor-pointer"
             onClick={handleLogout}
           />
-          <div>
+          <div className="flex flex-col items-center">
             <Image
-              src={userData?.avatar_url || avatarUrl}
-              alt={userData?.full_name || 'logged in user image'}
-              width={24}
-              height={24}
-              className="h-auto w-auto rounded-full"
+              src={displayAvatar}
+              alt={displayName || 'logged in user image'}
+              width={12}
+              height={12}
+              className="size-10 rounded-full object-cover"
             />
+            <p className="text-[10px] text-white text-center max-w-[64px] truncate">
+              {displayName}
+            </p>
           </div>
         </div>
       </aside>

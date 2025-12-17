@@ -18,7 +18,10 @@ export const Chats = () => {
     }
   }, [selectedChatUser]);
   return (
-    <main ref={chatsRef} className=" p-2 ">
+    <main
+      ref={chatsRef}
+      className="p-2 mb-2 h-full overflow-y-auto scrollbar-hide relative"
+    >
       <SingleChat />
     </main>
   );

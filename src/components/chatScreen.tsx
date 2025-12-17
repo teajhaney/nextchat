@@ -8,7 +8,7 @@ export const ChatScreen = () => {
       <div>
         <ChatHeader />
       </div>
-      <div className="bg-gray100 flex-1 overflow-y-auto scrollbar-hide">
+      <div className="bg-gray100 flex-1 overflow-hidden scrollbar-hide">
         <Chats />
       </div>
       {/* chat input */}

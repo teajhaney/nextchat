@@ -1,8 +1,8 @@
-
 export { LoadingSpinner } from './loadingSpinner';
 export { Sidebar } from './sidebar';
 export { ChatListBar } from './chatListBar';
 export { ChatList } from './chatList';
+export { ChatListSkeleton } from './chatListSkeleton';
 export { RecentChats } from './recentChats';
 export { SettingsBar } from './settingsBar';
 export { FullScreenLoader } from './fullScreenLoader';
@@ -20,6 +20,7 @@ export { ReadReceipt } from './readReceipt';
 //shadcn component
 export { Button } from './ui/button';
 export { Input } from './ui/input';
+export { Textarea } from './textarea';
 export { Toaster } from './ui/sonner';
 export { toast } from 'sonner';
 export { Form } from './ui/form';

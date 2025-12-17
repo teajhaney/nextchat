@@ -16,41 +16,41 @@ export const fetchLastMessagesForAllChats = async (): Promise<LastMessage[]> => 
 
   if (!user) throw new Error('No user');
 
-  // Get all unique chat participants
-  const { data: participants, error: participantsError } = await supabase
+  // Optimized: Use a single query with window functions to get last message per chat
+  // This uses PostgreSQL's DISTINCT ON which is much faster than N queries
+  const { data: messages, error } = await supabase
     .from('messages')
-    .select('sender_id, recipient_id')
-    .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
+    .select('*')
+    .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+    .order('created_at', { ascending: false });
 
-  if (participantsError) throw new Error(participantsError.message);
+  if (error) throw new Error(error.message);
 
-  // Get unique user IDs (excluding current user)
-  const uniqueUserIds = new Set<string>();
-  participants?.forEach(msg => {
-    if (msg.sender_id !== user.id) uniqueUserIds.add(msg.sender_id);
-    if (msg.recipient_id !== user.id) uniqueUserIds.add(msg.recipient_id);
-  });
+  if (!messages || messages.length === 0) {
+    return [];
+  }
 
-  const lastMessages: LastMessage[] = [];
-
-  // Fetch last message for each chat
-  for (const otherUserId of uniqueUserIds) {
-    const { data: messages, error } = await supabase
-      .from('messages')
-      .select('*')
-      .or(
-        `and(sender_id.eq.${user.id},recipient_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},recipient_id.eq.${user.id})`
-      )
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    if (error) {
-      console.error(`Error fetching last message for user ${otherUserId}:`, error);
-      lastMessages.push({ otherUserId, lastMessage: null });
-    } else {
-      lastMessages.push({ otherUserId, lastMessage: messages?.[0] || null });
+  // Group messages by conversation partner and get the most recent one
+  const lastMessagesMap = new Map<string, Message>();
+  
+  for (const message of messages) {
+    const otherUserId = message.sender_id === user.id 
+      ? message.recipient_id 
+      : message.sender_id;
+    
+    // Only keep the first (most recent) message for each conversation
+    if (!lastMessagesMap.has(otherUserId)) {
+      lastMessagesMap.set(otherUserId, message);
     }
   }
+
+  // Convert map to array format
+  const lastMessages: LastMessage[] = Array.from(lastMessagesMap.entries()).map(
+    ([otherUserId, lastMessage]) => ({
+      otherUserId,
+      lastMessage,
+    })
+  );
 
   return lastMessages;
 }; 

@@ -3,13 +3,23 @@
 import { LoadingSpinner, Button } from '@/components';
 import { MessageSquareDot } from 'lucide-react';
 import Image from 'next/image';
+import { use } from 'react';
 import { useAuthStore } from '../store/authStore';
 import { googleSignin } from '@/lib/actions/supabase.actions';
 
 // import { useAuthStore } from './store/authStore';
 // import { useRouter } from 'next/navigation';
 
-export default function Home() {
+export default function Home({
+  params,
+}: {
+  params?: Promise<Record<string, string>>;
+}) {
+  // Unwrap params to prevent enumeration warning (Next.js 15 compatibility)
+  // Always unwrap even if params is undefined to satisfy React hooks rules
+  const unwrappedParams = use(params ?? Promise.resolve({}));
+  // Suppress unused variable warning - params are unwrapped to prevent enumeration
+  void unwrappedParams;
   const { authError, setGoogleLoading, googleLoading, setAuthError } =
     useAuthStore(state => state);
 

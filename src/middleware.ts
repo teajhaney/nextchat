@@ -27,7 +27,9 @@ async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
           supabaseResponse = NextResponse.next({
             request,
           });
@@ -41,7 +43,11 @@ async function updateSession(request: NextRequest) {
 
   // Handle logout request
   if (request.nextUrl.pathname === '/logout') {
-    await supabase.auth.signOut();
+    // Sign out from Supabase (non-blocking for user experience)
+    supabase.auth.signOut().catch(error => {
+      console.error('Error signing out:', error);
+    });
+
     const response = NextResponse.redirect(new URL('/', request.url));
     // Clear Supabase cookies
     request.cookies.getAll().forEach(cookie => {
@@ -50,7 +56,10 @@ async function updateSession(request: NextRequest) {
       }
     });
     // Prevent caching
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    response.headers.set(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate'
+    );
     return response;
   }
 
@@ -74,5 +83,3 @@ async function updateSession(request: NextRequest) {
 
   return supabaseResponse;
 }
-
-

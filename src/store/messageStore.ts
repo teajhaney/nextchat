@@ -14,6 +14,12 @@ import {
 } from '@/lib/storage/localMessageStorage';
 import { markMessagesAsRead } from '@/lib/services/readReceiptService';
 import { fetchLastMessagesForAllChats } from '@/lib/services/lastMessageService';
+import { fetchUnreadCountsForAllChats } from '@/lib/services/unreadCountService';
+import { fetchChatDataForAllChats } from '@/lib/services/chatDataService';
+import {
+  subscribeToUnreadCounts,
+  unsubscribeFromUnreadCounts,
+} from '@/lib/services/unreadCountSubscription';
 
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
@@ -22,11 +28,13 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   subscription: null,
   currentChatUserId: null,
   lastMessages: [],
+  unreadCounts: [],
   pendingReadReceipts: new Set<string>(),
+  unreadCountSubscription: null,
+  isChatDataLoading: false,
 
-  setSelectedChatUser: async otherUser => {
+  setSelectedChatUser: otherUser => {
     const { subscription, unsubscribeFromMessages, currentChatUserId } = get();
-
     // Handle null case - clear selected chat
     if (!otherUser) {
       if (subscription) {
@@ -40,10 +48,13 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       });
       return;
     }
-
     if (otherUser.id === currentChatUserId) return;
     const { user: currentUser } = useAuthStore.getState();
     if (!currentUser) return;
+    // Unsubscribe from previous chat first
+    if (subscription) {
+      unsubscribeFromMessages();
+    }
 
     // Load cached messages immediately from local storage
     const cachedMessages = getStoredMessages(currentUser.id, otherUser.id);
@@ -56,18 +67,38 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       messages: cachedMessages,
     });
 
-    // Unsubscribe from previous chat
-    if (subscription) {
-      unsubscribeFromMessages();
+    // Mark all visible unread messages as read immediately
+    const unreadMessages = cachedMessages.filter(
+      msg =>
+        msg.sender_id === otherUser.id &&
+        msg.recipient_id === currentUser.id &&
+        !msg.is_read
+    );
+    if (unreadMessages.length > 0) {
+      const messageIds = unreadMessages.map(msg => msg.id);
+      // Don't await - let it happen in background
+      get().markMessagesAsRead(messageIds);
     }
 
-    // fetch fresh messages and subscribe
-    get().fetchMessages(otherUser.id);
-    get().subscribeToMessages();
+    // fetch fresh messages and subscribe (fire and forget)
+    // Only run on client side
+    if (typeof window !== 'undefined') {
+      Promise.all([
+        get().fetchMessages(otherUser.id),
+        get().subscribeToMessages(),
+      ]).catch(error => {
+        console.error('Error in setSelectedChatUser async operations:', error);
+      });
+    }
   },
 
   //FETCH messages for the selected user
   fetchMessages: async otherUserId => {
+    // Ensure we're in a browser environment
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     const { selectedChatUser } = get();
 
     // Ensure we're still on the same chat (prevent race conditions)
@@ -185,119 +216,219 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   //ADD message to the store
   addMessage: message => {
     const { messages, selectedChatUser } = get();
-    if (!selectedChatUser) return;
+    const { user } = useAuthStore.getState();
+
+    if (!user) return;
 
     // Check if message already exists (avoid duplicates)
     const exists = messages.some(msg => msg.id === message.id);
     if (exists) return;
 
     // Check if this message belongs to current chat
-    const { user } = useAuthStore.getState();
     const isCurrentChat =
-      (message.sender_id === user.id &&
+      selectedChatUser &&
+      ((message.sender_id === user.id &&
         message.recipient_id === selectedChatUser.id) ||
-      (message.sender_id === selectedChatUser.id &&
-        message.recipient_id === user.id);
+        (message.sender_id === selectedChatUser.id &&
+          message.recipient_id === user.id));
 
-    if (isCurrentChat) {
-      const newMessages = [...messages, message];
+    if (isCurrentChat && selectedChatUser) {
+      // Remove any optimistic message with same content and timestamp
+      const filteredMessages = messages.filter(
+        msg =>
+          !(
+            (
+              msg.id.startsWith('temp-') &&
+              msg.content === message.content &&
+              Math.abs(
+                new Date(msg.created_at).getTime() -
+                  new Date(message.created_at).getTime()
+              ) < 5000
+            ) // Within 5 seconds
+          )
+      );
+
+      const newMessages = [...filteredMessages, message];
       set({ messages: newMessages });
 
       // Update localStorage with new message
-      if (user) {
-        storeMessages(user.id, selectedChatUser.id, newMessages);
-      }
+      storeMessages(user.id, selectedChatUser.id, newMessages);
 
+      // Update last messages and unread counts together
+      const otherUserId =
+        message.sender_id === user.id
+          ? message.recipient_id
+          : message.sender_id;
+
+      // Update lastMessages - move updated chat to top (most recent first)
       set(state => {
-        const otherUserId =
-          message.sender_id === user.id
-            ? message.recipient_id
-            : message.sender_id;
+        const filtered = state.lastMessages.filter(
+          lm => lm.otherUserId !== otherUserId
+        );
+        // Put the updated chat at the beginning (most recent)
         const updatedLastMessages = [
-          ...state.lastMessages.filter(lm => lm.otherUserId !== otherUserId),
           { otherUserId, lastMessage: message },
+          ...filtered,
         ];
         return { lastMessages: updatedLastMessages };
       });
+
+      // Refresh unread counts when a new message is received (always update together)
+      // Only if the message is from another user (not from current user)
+      if (message.sender_id !== user.id) {
+        get().fetchUnreadCounts();
+      }
+    } else {
+      // Message is for a different chat - update last messages and unread counts together
+      if (message.sender_id !== user.id) {
+        const otherUserId = message.sender_id;
+        // Update lastMessages - move updated chat to top (most recent first)
+        set(state => {
+          const filtered = state.lastMessages.filter(
+            lm => lm.otherUserId !== otherUserId
+          );
+          // Put the updated chat at the beginning (most recent)
+          const updatedLastMessages = [
+            { otherUserId, lastMessage: message },
+            ...filtered,
+          ];
+          return { lastMessages: updatedLastMessages };
+        });
+        // Then fetch unread counts (they update together)
+        get().fetchUnreadCounts();
+      } else {
+        // Message sent by current user to another chat - still update lastMessages and move to top
+        const otherUserId = message.recipient_id;
+        set(state => {
+          const filtered = state.lastMessages.filter(
+            lm => lm.otherUserId !== otherUserId
+          );
+          // Put the updated chat at the beginning (most recent)
+          const updatedLastMessages = [
+            { otherUserId, lastMessage: message },
+            ...filtered,
+          ];
+          return { lastMessages: updatedLastMessages };
+        });
+      }
     }
   },
 
   //UPDATE message in the store
   updateMessage: (updatedMessage: Message) => {
-    const { messages, selectedChatUser, pendingReadReceipts } = get();
-    if (!selectedChatUser) return;
-
+    const { messages, selectedChatUser } = get();
     const { user } = useAuthStore.getState();
+
+    if (!user) return;
+
     const isCurrentChat =
-      (updatedMessage.sender_id === user.id &&
+      selectedChatUser &&
+      ((updatedMessage.sender_id === user.id &&
         updatedMessage.recipient_id === selectedChatUser.id) ||
-      (updatedMessage.sender_id === selectedChatUser.id &&
-        updatedMessage.recipient_id === user.id);
+        (updatedMessage.sender_id === selectedChatUser.id &&
+          updatedMessage.recipient_id === user.id));
 
-    if (isCurrentChat) {
-      // If the message is not found, store the read receipt for later
-      const messageExists = messages.some(msg => msg.id === updatedMessage.id);
-      if (!messageExists && updatedMessage.is_read) {
-        // Add to pendingReadReceipts
-        set(() => {
-          const newSet = new Set(pendingReadReceipts);
-          newSet.add(updatedMessage.id);
-          return { pendingReadReceipts: newSet };
-        });
-        return;
-      }
-
+    if (isCurrentChat && selectedChatUser) {
       // Find and update the specific message
       const updatedMessages = messages.map(msg => {
-        // If this is the real message replacing an optimistic one, check pendingReadReceipts
+        // Handle optimistic message replacement with read receipt
         if (
           msg.id.startsWith('temp-') &&
           updatedMessage.content === msg.content &&
-          updatedMessage.created_at === msg.created_at
+          Math.abs(
+            new Date(msg.created_at).getTime() -
+              new Date(updatedMessage.created_at).getTime()
+          ) < 5000
         ) {
-          // If we have a pending read receipt, set is_read: true
-          const isRead =
-            updatedMessage.is_read ||
-            get().pendingReadReceipts.has(updatedMessage.id);
-          return { ...updatedMessage, is_read: isRead };
+          return { ...updatedMessage, is_read: updatedMessage.is_read };
         }
-        return msg.id === updatedMessage.id
-          ? { ...msg, ...updatedMessage }
-          : msg;
+        // Update existing message - ensure is_read is properly updated
+        if (msg.id === updatedMessage.id) {
+          return { ...msg, ...updatedMessage };
+        }
+        return msg;
       });
 
       set({ messages: updatedMessages });
 
-      // Remove from pendingReadReceipts if present
-      if (get().pendingReadReceipts.has(updatedMessage.id)) {
-        set(() => {
-          const newSet = new Set(pendingReadReceipts);
-          newSet.delete(updatedMessage.id);
-          return { pendingReadReceipts: newSet };
+      // Update localStorage
+      storeMessages(user.id, selectedChatUser.id, updatedMessages);
+
+      // Update lastMessages if the updated message is the last message
+      const isLastMessage =
+        updatedMessages[updatedMessages.length - 1]?.id === updatedMessage.id;
+      if (isLastMessage) {
+        const otherUserId =
+          updatedMessage.sender_id === user.id
+            ? updatedMessage.recipient_id
+            : updatedMessage.sender_id;
+        set(state => {
+          const updatedLastMessages = state.lastMessages.map(lm =>
+            lm.otherUserId === otherUserId
+              ? { ...lm, lastMessage: updatedMessage }
+              : lm
+          );
+          return { lastMessages: updatedLastMessages };
         });
       }
 
-      // Update localStorage
-      if (user) {
-        storeMessages(user.id, selectedChatUser.id, updatedMessages);
+      // Refresh unread counts when read receipt is updated (update together)
+      if (updatedMessage.is_read) {
+        get().fetchUnreadCounts();
+      }
+    } else {
+      // Update last messages for other chats if read receipt changed
+      if (updatedMessage.is_read) {
+        set(state => {
+          const otherUserId =
+            updatedMessage.sender_id === user.id
+              ? updatedMessage.recipient_id
+              : updatedMessage.sender_id;
+          const existingLastMessage = state.lastMessages.find(
+            lm => lm.otherUserId === otherUserId
+          );
+          if (existingLastMessage?.lastMessage?.id === updatedMessage.id) {
+            const updatedLastMessages = state.lastMessages.map(lm =>
+              lm.otherUserId === otherUserId
+                ? { ...lm, lastMessage: updatedMessage }
+                : lm
+            );
+            return { lastMessages: updatedLastMessages };
+          }
+          return state;
+        });
+        get().fetchUnreadCounts();
       }
     }
   },
 
   //SUBSCRIBE to messages for the selected user
   subscribeToMessages: async () => {
-    const { selectedChatUser, addMessage, updateMessage } = get();
+    // Ensure we're in a browser environment
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const { selectedChatUser, addMessage, updateMessage, subscription } = get();
     if (!selectedChatUser) return;
-    const subscription = await subscribeToMessages(
-      selectedChatUser?.id,
-      addMessage,
-      updateMessage // callback for message updates (read receipts)
-    );
-    set({ subscription });
+
+    try {
+      const newSubscription = await subscribeToMessages(
+        selectedChatUser.id,
+        addMessage,
+        updateMessage, // callback for message updates (read receipts)
+        subscription // pass existing channel for cleanup
+      );
+      if (newSubscription) {
+        set({ subscription: newSubscription });
+      }
+    } catch (error) {
+      console.error('Failed to subscribe to messages:', error);
+    }
   },
 
   //UNSUBSCRIBE from messages
-  unsubscribeFromMessages: async () => {
+  unsubscribeFromMessages: () => {
     const { subscription } = get();
     if (subscription) {
       supabase.removeChannel(subscription);
@@ -323,28 +454,76 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     if (!selectedChatUser || messageIds.length === 0) return;
 
     try {
-      // Optimistically update UI - only update messages that are being marked as read
+      // Filter to only messages that are actually unread
+      const messagesToMark = messages.filter(
+        msg => messageIds.includes(msg.id) && !msg.is_read
+      );
+
+      if (messagesToMark.length === 0) return;
+
+      const idsToMark = messagesToMark.map(msg => msg.id);
+
+      // Optimistically update UI immediately
       const updatedMessages = messages.map(msg =>
-        messageIds.includes(msg.id) ? { ...msg, is_read: true } : msg
+        idsToMark.includes(msg.id) ? { ...msg, is_read: true } : msg
       );
       set({ messages: updatedMessages });
 
       // Update server
-      await markMessagesAsRead(messageIds);
+      await markMessagesAsRead(idsToMark);
 
       // Update localStorage
       const { user } = useAuthStore.getState();
       if (user) {
         storeMessages(user.id, selectedChatUser.id, updatedMessages);
       }
+
+      // Update lastMessages if the last message was just marked as read
+      const lastMessage = updatedMessages[updatedMessages.length - 1];
+      if (lastMessage && idsToMark.includes(lastMessage.id)) {
+        const otherUserId =
+          lastMessage.sender_id === user?.id
+            ? lastMessage.recipient_id
+            : lastMessage.sender_id;
+        set(state => {
+          const updatedLastMessages = state.lastMessages.map(lm =>
+            lm.otherUserId === otherUserId
+              ? { ...lm, lastMessage: lastMessage }
+              : lm
+          );
+          return { lastMessages: updatedLastMessages };
+        });
+      }
+
+      // Refresh unread counts immediately after marking messages as read (update together)
+      get().fetchUnreadCounts();
     } catch (error) {
       console.error('Failed to mark messages as read:', error);
-      // Don't revert here - we'll get the correct state on next fetch
-      get().fetchMessages(selectedChatUser.id);
+      // Revert optimistic update on error
+      const { messages: currentMessages } = get();
+      const revertedMessages = currentMessages.map(msg =>
+        messageIds.includes(msg.id) ? { ...msg, is_read: false } : msg
+      );
+      set({ messages: revertedMessages });
     }
   },
 
-  // Add new method to fetch last messages for all chats
+  // Optimized: Fetch both last messages and unread counts together (single database call)
+  // Returns data sorted by last message timestamp (most recent first)
+  fetchChatData: async () => {
+    // Set loading state to prevent showing "no message yet" flash
+    set({ isChatDataLoading: true });
+    try {
+      const { lastMessages, unreadCounts } = await fetchChatDataForAllChats();
+      // Data is already sorted by chatDataService, just set it
+      set({ lastMessages, unreadCounts, isChatDataLoading: false });
+    } catch (error) {
+      console.error('Failed to fetch chat data:', error);
+      set({ isChatDataLoading: false });
+    }
+  },
+
+  // Add new method to fetch last messages for all chats (kept for backward compatibility)
   fetchLastMessagesForAllChats: async () => {
     try {
       const lastMessages = await fetchLastMessagesForAllChats();
@@ -352,6 +531,47 @@ export const useMessageStore = create<MessageState>((set, get) => ({
     } catch (error) {
       console.error('Failed to fetch last messages:', error);
     }
+  },
+
+  // Fetch unread message counts for all chats (kept for backward compatibility)
+  fetchUnreadCounts: async () => {
+    try {
+      const unreadCounts = await fetchUnreadCountsForAllChats();
+      set({ unreadCounts });
+    } catch (error) {
+      console.error('Failed to fetch unread counts:', error);
+    }
+  },
+
+  // Subscribe to unread count changes
+  subscribeToUnreadCounts: async () => {
+    // Ensure we're in a browser environment
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const { unreadCountSubscription } = get();
+
+    // Unsubscribe from existing subscription if any
+    if (unreadCountSubscription) {
+      unsubscribeFromUnreadCounts();
+    }
+
+    // Subscribe to unread count changes
+    const subscription = await subscribeToUnreadCounts(() => {
+      // Refresh unread counts and last messages together (optimized: single call)
+      get().fetchChatData();
+    });
+
+    if (subscription) {
+      set({ unreadCountSubscription: subscription });
+    }
+  },
+
+  // Unsubscribe from unread count changes
+  unsubscribeFromUnreadCounts: () => {
+    unsubscribeFromUnreadCounts();
+    set({ unreadCountSubscription: null });
   },
 }));
 

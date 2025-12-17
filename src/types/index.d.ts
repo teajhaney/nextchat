@@ -33,6 +33,11 @@ declare interface ProfileData {
   //   last_seen: string;
 }
 
+declare interface UnreadCount {
+  otherUserId: string;
+  count: number;
+}
+
 declare interface MessageState {
   messages: Message[];
   isLoading: boolean;
@@ -40,15 +45,22 @@ declare interface MessageState {
   subscription: RealtimeChannel | null;
   currentChatUserId: string | null;
   lastMessages: LastMessage[];
+  unreadCounts: UnreadCount[];
   pendingReadReceipts: Set<string>;
+  unreadCountSubscription: RealtimeChannel | null;
+  isChatDataLoading: boolean;
   setSelectedChatUser: (user: ProfileData | null) => void;
   fetchMessages: (otherUserId: string) => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
   addMessage: (message: Message) => void;
-  subscribeToMessages: () => void;
+  subscribeToMessages: () => Promise<void>;
   unsubscribeFromMessages: () => void;
   updateMessage: (message: Message) => void;
+  fetchChatData: () => Promise<void>;
   fetchLastMessagesForAllChats: () => Promise<void>;
+  fetchUnreadCounts: () => Promise<void>;
+  subscribeToUnreadCounts: () => Promise<void>;
+  unsubscribeFromUnreadCounts: () => void;
   markMessagesAsRead: (messageIds: string[]) => Promise<void>;
   clearMessageCache: () => void;
   clearOldMessages: () => void;
