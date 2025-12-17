@@ -27,3 +27,26 @@ export const searchUserByEmail = async (
 
   return data;
 };
+
+/**
+ * Fetch a user profile by user ID
+ */
+export const fetchUserById = async (userId: string): Promise<UserData | null> => {
+  const supabase = supabaseBrowser();
+  
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, email, avatar_url')
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      // No rows returned
+      return null;
+    }
+    throw new Error(error.message);
+  }
+
+  return data;
+};

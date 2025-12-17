@@ -20,6 +20,7 @@ import {
   subscribeToUnreadCounts,
   unsubscribeFromUnreadCounts,
 } from '@/lib/services/unreadCountSubscription';
+import { fetchUserById } from '@/lib/services/userService';
 
 export const useMessageStore = create<MessageState>((set, get) => ({
   messages: [],
@@ -282,6 +283,24 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       // Message is for a different chat - update last messages and unread counts together
       if (message.sender_id !== user.id) {
         const otherUserId = message.sender_id;
+
+        // Check if this user exists in otherUserData, if not, fetch and add them
+        const { otherUserData, setOtherUserData } = useAuthStore.getState();
+        const userExists = otherUserData.some(u => u.id === otherUserId);
+
+        if (!userExists) {
+          // Fetch user profile and add to otherUserData
+          fetchUserById(otherUserId)
+            .then(newUser => {
+              if (newUser) {
+                setOtherUserData([...otherUserData, newUser]);
+              }
+            })
+            .catch(error => {
+              console.error('Failed to fetch user profile:', error);
+            });
+        }
+
         // Update lastMessages - move updated chat to top (most recent first)
         set(state => {
           const filtered = state.lastMessages.filter(
@@ -319,6 +338,24 @@ export const useMessageStore = create<MessageState>((set, get) => ({
       } else {
         // Message sent by current user to another chat - still update lastMessages and move to top
         const otherUserId = message.recipient_id;
+
+        // Check if this user exists in otherUserData, if not, fetch and add them
+        const { otherUserData, setOtherUserData } = useAuthStore.getState();
+        const userExists = otherUserData.some(u => u.id === otherUserId);
+
+        if (!userExists) {
+          // Fetch user profile and add to otherUserData
+          fetchUserById(otherUserId)
+            .then(newUser => {
+              if (newUser) {
+                setOtherUserData([...otherUserData, newUser]);
+              }
+            })
+            .catch(error => {
+              console.error('Failed to fetch user profile:', error);
+            });
+        }
+
         set(state => {
           const filtered = state.lastMessages.filter(
             lm => lm.otherUserId !== otherUserId
