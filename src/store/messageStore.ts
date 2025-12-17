@@ -294,7 +294,27 @@ export const useMessageStore = create<MessageState>((set, get) => ({
           ];
           return { lastMessages: updatedLastMessages };
         });
-        // Then fetch unread counts (they update together)
+        // Optimistically update unread counts for this chat
+        set(state => {
+          const existingUnread = state.unreadCounts.find(
+            uc => uc.otherUserId === otherUserId
+          );
+          if (existingUnread) {
+            // Increment existing count
+            const updatedUnreadCounts = state.unreadCounts.map(uc =>
+              uc.otherUserId === otherUserId
+                ? { ...uc, count: uc.count + 1 }
+                : uc
+            );
+            return { unreadCounts: updatedUnreadCounts };
+          } else {
+            // Add new unread count entry
+            return {
+              unreadCounts: [...state.unreadCounts, { otherUserId, count: 1 }],
+            };
+          }
+        });
+        // Then fetch unread counts to sync with database (in background)
         get().fetchUnreadCounts();
       } else {
         // Message sent by current user to another chat - still update lastMessages and move to top

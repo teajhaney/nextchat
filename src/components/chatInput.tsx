@@ -21,8 +21,18 @@ export const ChatInput = () => {
     },
   });
 
-  const { sendMessage } = useMessageStore();
+  const { sendMessage, selectedChatUser } = useMessageStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-focus textarea when a chat is opened
+  useEffect(() => {
+    if (selectedChatUser && textareaRef.current) {
+      // Small delay to ensure the component is fully rendered
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    }
+  }, [selectedChatUser]);
 
   // Auto-resize textarea based on content
   const adjustTextareaHeight = () => {

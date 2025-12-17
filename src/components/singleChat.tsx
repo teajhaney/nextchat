@@ -448,9 +448,89 @@ export const SingleChat = () => {
     );
   }
 
+  // Helper function to format date separator (like WhatsApp)
+  const formatDateSeparator = (date: Date): string => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const messageDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+
+    const diffInDays = Math.floor(
+      (today.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (diffInDays === 0) {
+      return 'Today';
+    } else if (diffInDays === 1) {
+      return 'Yesterday';
+    } else if (diffInDays < 7) {
+      return date.toLocaleDateString([], { weekday: 'long' });
+    } else {
+      return date.toLocaleDateString([], {
+        month: 'long',
+        day: 'numeric',
+        year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+      });
+    }
+  };
+
+  // Helper function to check if two dates are on the same day
+  const isSameDay = (date1: Date, date2: Date): boolean => {
+    return (
+      date1.getFullYear() === date2.getFullYear() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getDate() === date2.getDate()
+    );
+  };
+
+  // Group messages with date separators
+  const messagesWithSeparators: Array<
+    | { type: 'message'; message: (typeof messages)[0] }
+    | { type: 'date'; date: Date; formattedDate: string }
+  > = [];
+
+  messages.forEach((message, index) => {
+    const messageDate = new Date(message.created_at);
+    const prevMessage = index > 0 ? messages[index - 1] : null;
+    const prevMessageDate = prevMessage
+      ? new Date(prevMessage.created_at)
+      : null;
+
+    // Add date separator if this is the first message or if the day changed
+    if (!prevMessageDate || !isSameDay(messageDate, prevMessageDate)) {
+      messagesWithSeparators.push({
+        type: 'date',
+        date: messageDate,
+        formattedDate: formatDateSeparator(messageDate),
+      });
+    }
+
+    messagesWithSeparators.push({
+      type: 'message',
+      message,
+    });
+  });
+
   return (
     <div className="relative h-full" ref={chatContainerRef}>
-      {messages.map(message => {
+      {messagesWithSeparators.map((item, idx) => {
+        if (item.type === 'date') {
+          return (
+            <div
+              key={`date-${idx}-${item.date.toISOString()}`}
+              className="flex justify-center my-4"
+            >
+              <div className="px-3 py-1.5 bg-primary/10 text-primary text-xs font-medium rounded-full">
+                {item.formattedDate}
+              </div>
+            </div>
+          );
+        }
+
+        const message = item.message;
         const isOwnMessage = message.sender_id === user?.id;
         const avatar = isOwnMessage
           ? userData?.avatar_url
@@ -463,21 +543,26 @@ export const SingleChat = () => {
               isOwnMessage ? 'flex-row-reverse items-end' : ''
             }`}
           >
-            <Image
-              src={avatar || '/images/google.svg'}
-              alt="User Avatar"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
+            {!isOwnMessage && (
+              <Image
+                src={avatar || '/images/google.svg'}
+                alt="User Avatar"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+            )}
+
             <div
-              className={`relative text-sm p-2 shadow rounded-b-lg max-w-10/12 ${
+              className={`relative text-sm p-2 shadow rounded-b-lg max-w-10/12 break-words overflow-hidden ${
                 isOwnMessage
                   ? 'bg-primary/20 rounded-tl-lg'
                   : 'rounded-tr-lg bg-gray100'
               }`}
             >
-              <p className="text-gray-800">{message.content}</p>
+              <p className="text-gray-800 break-words whitespace-pre-wrap">
+                {message.content}
+              </p>
               <div className="flex gap-2 justify-between items-center">
                 <div className={`text-[8px] mt-1 text-primary`}>
                   {new Date(message.created_at).toLocaleTimeString([], {
