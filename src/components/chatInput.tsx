@@ -24,13 +24,20 @@ export const ChatInput = () => {
   const { sendMessage, selectedChatUser } = useMessageStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-focus textarea when a chat is opened
+  // Auto-focus textarea when a chat is opened (desktop only - don't trigger keyboard on mobile)
   useEffect(() => {
     if (selectedChatUser && textareaRef.current) {
-      // Small delay to ensure the component is fully rendered
-      setTimeout(() => {
-        textareaRef.current?.focus();
-      }, 100);
+      // Only auto-focus on desktop devices (not mobile)
+      const isMobile =
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+        window.innerWidth < 768;
+
+      if (!isMobile) {
+        // Small delay to ensure the component is fully rendered
+        setTimeout(() => {
+          textareaRef.current?.focus();
+        }, 100);
+      }
     }
   }, [selectedChatUser]);
 
