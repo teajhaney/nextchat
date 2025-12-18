@@ -37,11 +37,10 @@ export const Sidebar = () => {
     userData?.avatar_url || user?.user_metadata?.avatar_url || avatarUrl;
 
   return (
-    <div className="flex h-screen max-lg:w-full">
+    <div className="flex h-screen max-lg:h-[100dvh] max-lg:w-full overflow-hidden">
       {/* Primary Sidebar */}
-      <aside className=" h-screen w-20  border-r border-r-primary bg-background px-2 py-5 flex flex-col  items-center gap-10">
-        <div className="flex flex-col items-center gap-5">
-          {' '}
+      <aside className="h-screen max-lg:h-[100dvh] w-20 border-r border-r-primary bg-background px-2 py-5 flex flex-col items-center justify-between">
+        <div className="flex flex-col items-center gap-5 flex-shrink-0">
           <Link href="/chat">
             <MessageSquareDot className="text-primary size-10 cursor-pointer" />
           </Link>
@@ -51,19 +50,19 @@ export const Sidebar = () => {
               onClick={() => setActiveItem(title)}
               className={clsx(
                 'size-10 center cursor-pointer',
-                activeItem === title && 'bg-primary  rounded-md'
+                activeItem === title && 'bg-primary rounded-md'
               )}
             >
               <Icon
                 className={clsx(
                   'text-textColor size-6 cursor-pointer',
-                  activeItem === title && 'text-white  rounded-md'
+                  activeItem === title && 'text-white rounded-md'
                 )}
               />
             </div>
           ))}
         </div>
-        <div className="flex flex-col items-center gap-2 mt-auto pb-4">
+        <div className="flex flex-col items-center gap-2 flex-shrink-0 pb-4">
           <LogOut
             className="text-red-600 cursor-pointer"
             onClick={handleLogout}
@@ -83,8 +82,8 @@ export const Sidebar = () => {
         </div>
       </aside>
       {/* Secondary Sidebar */}
-      <aside className="max-lg:w-full h-screen lg:w-96 lg:border-r border-r-primary bg-background ">
-        <div className="secondary-sidebar w-full h-full">
+      <aside className="max-lg:w-full h-screen max-lg:h-[100dvh] lg:w-96 lg:border-r border-r-primary bg-background overflow-hidden">
+        <div className="secondary-sidebar w-full h-full overflow-hidden">
           {activeItem === 'Chats' && <ChatListBar />}
           {activeItem === 'Settings' && <SettingsBar />}
         </div>

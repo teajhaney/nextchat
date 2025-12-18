@@ -39,6 +39,7 @@ export const SingleChat = () => {
   const visibilityCheckTimeoutRef = useRef<NodeJS.Timeout>(null);
   const lastButtonVisibilityRef = useRef<boolean>(false);
   const isUserScrollingRef = useRef(false);
+  const hasMarkedMessagesAsReadRef = useRef<string | null>(null);
 
   // Track scroll position using message count (like modern chat apps)
   useEffect(() => {
@@ -246,11 +247,20 @@ export const SingleChat = () => {
     markMessagesAsRead,
   ]);
 
-  // Mark messages as read when chat opens
+  // Mark messages as read when chat opens or when messages are first loaded
   useEffect(() => {
     if (!selectedChatUser || !user || messages.length === 0) return;
 
-    // Mark all unread messages from the other user as read immediately when chat opens
+    // Reset the ref when chat user changes
+    const currentChatKey = selectedChatUser.id;
+    if (hasMarkedMessagesAsReadRef.current !== currentChatKey) {
+      hasMarkedMessagesAsReadRef.current = currentChatKey;
+    } else {
+      // Already marked messages for this chat, skip to avoid re-marking on every message update
+      return;
+    }
+
+    // Mark all unread messages from the other user as read immediately when chat opens or messages load
     const unreadMessages = messages.filter(
       msg =>
         msg.sender_id === selectedChatUser.id &&
@@ -266,7 +276,7 @@ export const SingleChat = () => {
       setUnreadCount(0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChatUser?.id, user?.id]); // Only run when chat user changes
+  }, [selectedChatUser?.id, user?.id, messages.length]); // Run when chat changes OR messages are loaded
 
   // Handle scroll to bottom button click
   const handleScrollToBottom = () => {

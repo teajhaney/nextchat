@@ -32,12 +32,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }, [selectedChatUser]);
 
   return (
-    <div className="text-textColor flex overflow-y-hidden relative">
+    <div className="text-textColor flex h-screen max-lg:h-[100dvh] w-full overflow-hidden relative">
       {/* Sidebar - always visible on large screens, hidden when chat is selected on small screens */}
       <div
         ref={sidebarRef}
         className={
-          selectedChatUser ? 'max-lg:hidden lg:block' : 'max-lg:w-full'
+          selectedChatUser
+            ? 'max-lg:hidden lg:block flex-shrink-0'
+            : 'max-lg:w-full flex-shrink-0'
         }
       >
         <Sidebar />
@@ -47,12 +49,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {selectedChatUser ? (
         <div
           ref={chatContentRef}
-          className="lg:flex-1 max-lg:inset-0 max-lg:z-10 max-lg:w-full"
+          className="lg:flex-1 max-lg:inset-0 max-lg:z-10 max-lg:w-full min-w-0 overflow-hidden"
         >
           {children}
         </div>
       ) : (
-        <div className="max-lg:hidden lg:flex-1 lg:flex lg:items-center lg:justify-center">
+        <div className="max-lg:hidden lg:flex-1 lg:flex lg:items-center lg:justify-center min-w-0">
           {children}
         </div>
       )}

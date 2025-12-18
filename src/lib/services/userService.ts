@@ -31,9 +31,11 @@ export const searchUserByEmail = async (
 /**
  * Fetch a user profile by user ID
  */
-export const fetchUserById = async (userId: string): Promise<UserData | null> => {
+export const fetchUserById = async (
+  userId: string
+): Promise<UserData | null> => {
   const supabase = supabaseBrowser();
-  
+
   const { data, error } = await supabase
     .from('profiles')
     .select('id, full_name, email, avatar_url')
