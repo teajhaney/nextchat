@@ -4,7 +4,7 @@ import { ChatInput, Chats } from '@/components';
 
 export const ChatScreen = () => {
   return (
-    <div className="h-screen max-lg:h-[100dvh] flex flex-col">
+    <div className="h-screen max-lg:h-[100svh] flex flex-col">
       {/* Fixed header */}
       <div className="flex-shrink-0 bg-background">
         <ChatHeader />
