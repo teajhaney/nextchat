@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import gsap from 'gsap';
 import Image from 'next/image';
 import { avatarUrl } from '@/constants';
-import { ChatOptions } from '@/components';
+import { ChatOptions, ProfileModal } from '@/components';
 import { ArrowLeft } from 'lucide-react';
 import { useMessageStore } from '@/store/messageStore';
 import {
@@ -15,6 +15,7 @@ export const ChatHeader = () => {
   const { selectedChatUser, setSelectedChatUser, unreadCounts } =
     useMessageStore(state => state);
   const [isOnline, setIsOnline] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +86,8 @@ export const ChatHeader = () => {
           alt={selectedChatUser?.full_name || 'user avatar'}
           width={40}
           height={40}
-          className="size-10 rounded-full"
+          className="size-10 rounded-full cursor-pointer"
+          onClick={() => setIsProfileModalOpen(true)}
         />
         <div className="flex flex-col justify-between">
           <h1 className="font-bold">{selectedChatUser?.full_name}</h1>
@@ -97,6 +99,15 @@ export const ChatHeader = () => {
       <div>
         <ChatOptions />
       </div>
+      {/* Profile Modal */}
+      {selectedChatUser && (
+        <ProfileModal
+          open={isProfileModalOpen}
+          onOpenChange={setIsProfileModalOpen}
+          user={selectedChatUser}
+          isCurrentUser={false}
+        />
+      )}
     </div>
   );
 };

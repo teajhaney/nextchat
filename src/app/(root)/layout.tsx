@@ -49,7 +49,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       {selectedChatUser ? (
         <div
           ref={chatContentRef}
-          className="lg:flex-1 max-lg:fixed max-lg:inset-0 max-lg:z-10 max-lg:w-full max-lg:h-[100dvh] min-w-0 overflow-hidden"
+          className="lg:flex-1 max-lg:inset-0 max-lg:z-10 max-lg:w-full min-w-0 overflow-hidden"
         >
           {children}
         </div>

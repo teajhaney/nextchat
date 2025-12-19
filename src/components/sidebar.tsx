@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { LogOut, MessageSquareDot } from 'lucide-react';
 import { avatarUrl, sidebarItems } from '@/constants';
-import { ChatListBar, SettingsBar } from '@/components';
+import { ChatListBar, SettingsBar, ProfileModal } from '@/components';
 import clsx from 'clsx';
 import Image from 'next/image';
 import gsap from 'gsap';
@@ -12,6 +12,7 @@ import { useAuthStore } from '@/store/authStore';
 export const Sidebar = () => {
   const [activeItem, setActiveItem] = useState(sidebarItems[0].title); // Default to 'Chats'
   const { userData, user } = useAuthStore(state => state);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   useEffect(() => {
     gsap.fromTo(
       '.secondary-sidebar',
@@ -67,7 +68,10 @@ export const Sidebar = () => {
             className="text-red-600 cursor-pointer"
             onClick={handleLogout}
           />
-          <div className="flex flex-col items-center">
+          <div
+            className="flex flex-col items-center cursor-pointer"
+            onClick={() => setIsProfileModalOpen(true)}
+          >
             <Image
               src={displayAvatar}
               alt={displayName || 'logged in user image'}
@@ -88,6 +92,15 @@ export const Sidebar = () => {
           {activeItem === 'Settings' && <SettingsBar />}
         </div>
       </aside>
+      {/* Profile Modal for current user */}
+      {userData && (
+        <ProfileModal
+          open={isProfileModalOpen}
+          onOpenChange={setIsProfileModalOpen}
+          user={userData}
+          isCurrentUser={true}
+        />
+      )}
     </div>
   );
 };

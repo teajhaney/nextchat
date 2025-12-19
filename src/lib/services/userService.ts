@@ -52,3 +52,26 @@ export const fetchUserById = async (
 
   return data;
 };
+
+/**
+ * Update user profile information
+ */
+export const updateUserProfile = async (
+  userId: string,
+  updates: { full_name?: string; avatar_url?: string }
+): Promise<UserData | null> => {
+  const supabase = supabaseBrowser();
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .update(updates)
+    .eq('id', userId)
+    .select('id, full_name, email, avatar_url')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+};
