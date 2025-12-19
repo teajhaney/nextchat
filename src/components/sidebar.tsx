@@ -34,8 +34,11 @@ export const Sidebar = () => {
     user?.email ||
     'You';
 
-  const displayAvatar =
-    userData?.avatar_url || user?.user_metadata?.avatar_url || avatarUrl;
+  // Prioritize database avatar_url over OAuth metadata
+  // Only use OAuth metadata if database doesn't have an avatar_url
+  const displayAvatar = userData?.avatar_url
+    ? userData.avatar_url
+    : user?.user_metadata?.avatar_url || avatarUrl;
 
   return (
     <div className="flex h-screen max-lg:h-[100dvh] max-lg:w-full overflow-hidden">

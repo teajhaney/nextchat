@@ -33,7 +33,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    //check local storage for session
+    // Always fetch fresh data from database on mount to ensure profile updates are reflected
+    //  still use cached data for initial render but refresh immediately
     const cachedAuth = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (cachedAuth) {
       const parsedData = JSON.parse(cachedAuth);
@@ -113,9 +114,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    if (!cachedAuth) {
-      initializeSession();
-    }
+    // Always initialize session to fetch fresh data from database
+    // This ensures profile updates (like avatar changes) are reflected
+    initializeSession();
 
     //listening for auth state changes
     const {
