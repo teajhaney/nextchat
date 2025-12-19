@@ -64,6 +64,7 @@ declare interface MessageState {
   markMessagesAsRead: (messageIds: string[]) => Promise<void>;
   clearMessageCache: () => void;
   clearOldMessages: () => void;
+  deleteChat: (otherUserId: string) => Promise<void>;
 }
 
 // Tmessage data

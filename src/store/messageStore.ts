@@ -1,6 +1,10 @@
 'use client';
 import { create } from 'zustand';
-import { fetchMessages, sendMessage } from '@/lib/services/messageService';
+import {
+  fetchMessages,
+  sendMessage,
+  deleteChat as deleteChatService,
+} from '@/lib/services/messageService';
 import { subscribeToMessages } from '@/lib/services/messageSubscription';
 import { Message, MessageState } from '@/types/index';
 import { supabase } from '@/lib/supabase/supabase';
@@ -12,6 +16,11 @@ import {
   STORAGE_KEY,
   storeMessages,
 } from '@/lib/storage/localMessageStorage';
+
+// Helper function to get chat key (same as in localMessageStorage)
+const getChatKey = (userID: string, otherUserID: string): string => {
+  return [userID, otherUserID].sort().join('-');
+};
 import { markMessagesAsRead } from '@/lib/services/readReceiptService';
 import { fetchLastMessagesForAllChats } from '@/lib/services/lastMessageService';
 import { fetchUnreadCountsForAllChats } from '@/lib/services/unreadCountService';
@@ -505,6 +514,44 @@ export const useMessageStore = create<MessageState>((set, get) => ({
   // Clear old messages from localStorage
   clearOldMessages: () => {
     clearOldMessages();
+  },
+
+  // DELETE chat with a user (deletes all messages)
+  deleteChat: async (otherUserId: string) => {
+    const { selectedChatUser } = get();
+    const { user } = useAuthStore.getState();
+    if (!user) throw new Error('User not authenticated');
+
+    try {
+      // Delete messages from database
+      await deleteChatService(otherUserId);
+
+      // Clear messages from local storage for this chat
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const data = JSON.parse(stored);
+          const chatKey = getChatKey(user.id, otherUserId);
+          delete data[chatKey];
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+      }
+
+      // If this is the currently selected chat, clear it
+      if (selectedChatUser?.id === otherUserId) {
+        set({
+          selectedChatUser: null,
+          currentChatUserId: null,
+          messages: [],
+        });
+      }
+
+      // Refresh chat data to update lastMessages and unreadCounts
+      await get().fetchChatData();
+    } catch (error) {
+      console.error('Failed to delete chat:', error);
+      throw error;
+    }
   },
 
   // MARK messages as read

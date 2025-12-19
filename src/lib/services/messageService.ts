@@ -4,7 +4,9 @@ import { supabaseServer } from '../supabase/server';
 import { Message } from '@/types/index';
 
 //FETCH MESSAGES
-export const fetchMessages = async (otherUserId: string): Promise<Message[]> => {
+export const fetchMessages = async (
+  otherUserId: string
+): Promise<Message[]> => {
   const supabase = await supabaseServer();
   const {
     data: { user },
@@ -25,7 +27,10 @@ export const fetchMessages = async (otherUserId: string): Promise<Message[]> => 
 };
 
 //SEND MESSAGES
-export const sendMessage = async (recipientId: string, content: string): Promise<Message> => {
+export const sendMessage = async (
+  recipientId: string,
+  content: string
+): Promise<Message> => {
   const supabase = await supabaseServer();
   const {
     data: { user },
@@ -41,4 +46,24 @@ export const sendMessage = async (recipientId: string, content: string): Promise
 
   if (error) throw new Error(error.message);
   return data;
+};
+
+//DELETE ALL MESSAGES BETWEEN TWO USERS
+export const deleteChat = async (otherUserId: string): Promise<void> => {
+  const supabase = await supabaseServer();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('No user');
+
+  // Delete all messages where current user is sender or recipient with the other user
+  const { error } = await supabase
+    .from('messages')
+    .delete()
+    .or(
+      `and(sender_id.eq.${user.id},recipient_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},recipient_id.eq.${user.id})`
+    );
+
+  if (error) throw new Error(error.message);
 };

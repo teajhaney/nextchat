@@ -5,6 +5,16 @@ import { avatarUrl } from '@/constants';
 import { useMessageStore } from '@/store/messageStore';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
+import { Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from './ui/dialog';
+import { Button } from './ui/button';
 import {
   initializePresence,
   subscribeToPresence,
@@ -23,7 +33,11 @@ export const ChatList = () => {
     isChatDataLoading,
     subscribeToUnreadCounts,
     unsubscribeFromUnreadCounts,
+    deleteChat,
   } = useMessageStore(state => state);
+  const [chatToDelete, setChatToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [hoveredChatId, setHoveredChatId] = useState<string | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<Map<string, boolean>>(
     new Map()
   );
@@ -127,6 +141,20 @@ export const ChatList = () => {
     }
   };
 
+  const handleDeleteChat = async (userId: string, userName: string) => {
+    setIsDeleting(true);
+    try {
+      await deleteChat(userId);
+      toast.success(`Chat with ${userName} deleted`);
+      setChatToDelete(null);
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+      toast.error('Failed to delete chat. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   // Show loading skeleton while chat data is being fetched (prevents "no message yet" flash)
   if (isChatDataLoading && lastMessages.length === 0) {
     return (
@@ -186,61 +214,127 @@ export const ChatList = () => {
         return (
           <div
             key={id}
-            onClick={() =>
-              setSelectedChatUser({ id, full_name, avatar_url, email })
-            }
+            onMouseEnter={() => setHoveredChatId(id)}
+            onMouseLeave={() => setHoveredChatId(null)}
             className={clsx(
-              'p-3 flex justify-between items-center shadow rounded-sm cursor-pointer',
+              'p-3 flex justify-between items-center shadow rounded-sm cursor-pointer relative group',
               selectedChat && 'border border-primary'
             )}
           >
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <Image
-                  src={avatar_url || avatarUrl}
-                  alt={full_name}
-                  width={30}
-                  height={30}
-                  className="size-10 rounded-full"
-                />
-                {/* Online indicator - primary color circle on top right */}
-                {onlineUsers.get(id) && (
-                  <span className="absolute top-0 right-0 w-3 h-3 bg-primary rounded-full border-1 border-white"></span>
+            <div
+              onClick={() =>
+                setSelectedChatUser({ id, full_name, avatar_url, email })
+              }
+              className="flex-1 flex justify-between items-center"
+            >
+              <div className="flex items-center gap-2">
+                <div className="relative">
+                  <Image
+                    src={avatar_url || avatarUrl}
+                    alt={full_name}
+                    width={30}
+                    height={30}
+                    className="size-10 rounded-full"
+                  />
+                  {/* Online indicator - primary color circle on top right */}
+                  {onlineUsers.get(id) && (
+                    <span className="absolute top-0 right-0 w-3 h-3 bg-primary rounded-full border-1 border-white"></span>
+                  )}
+                </div>
+                <div className="flex flex-col justify-between">
+                  <h1 className={clsx(selectedChat && 'font-bold')}>
+                    {full_name}
+                  </h1>
+                  <h1 className="text-xs text-gray">
+                    {lastMessage ? (
+                      <span>
+                        {isOwnMessage ? 'You: ' : ''}
+                        {lastMessage.content.length > 30
+                          ? `${lastMessage.content.substring(0, 30)}...`
+                          : lastMessage.content}
+                      </span>
+                    ) : (
+                      'no message yet'
+                    )}
+                  </h1>
+                </div>
+              </div>
+              <div className="flex flex-col justify-between items-end gap-1">
+                <h1 className="text-xs text-gray">
+                  {lastMessage ? formatTime(lastMessage.created_at) : ''}
+                </h1>
+                {unreadCount > 0 && (
+                  <div className="relative">
+                    <span className=" -top-1 -right-1 bg-primary text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  </div>
                 )}
               </div>
-              <div className="flex flex-col justify-between">
-                <h1 className={clsx(selectedChat && 'font-bold')}>
-                  {full_name}
-                </h1>
-                <h1 className="text-xs text-gray">
-                  {lastMessage ? (
-                    <span>
-                      {isOwnMessage ? 'You: ' : ''}
-                      {lastMessage.content.length > 30
-                        ? `${lastMessage.content.substring(0, 30)}...`
-                        : lastMessage.content}
-                    </span>
-                  ) : (
-                    'no message yet'
-                  )}
-                </h1>
-              </div>
             </div>
-            <div className="flex flex-col justify-between items-end gap-1">
-              <h1 className="text-xs text-gray">
-                {lastMessage ? formatTime(lastMessage.created_at) : ''}
-              </h1>
-              {unreadCount > 0 && (
-                <div className="relative">
-                  <span className=" -top-1 -right-1 bg-primary text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-1">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                </div>
-              )}
-            </div>
+            {/* Delete button - shows on hover */}
+            {hoveredChatId === id && (
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  setChatToDelete(id);
+                }}
+                className="absolute right-2 p-2 hover:bg-red-500/20 rounded-full transition-colors z-10"
+                aria-label="Delete chat"
+              >
+                <Trash2 className="size-4 text-red-500" />
+              </button>
+            )}
           </div>
         );
       })}
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={chatToDelete !== null}
+        onOpenChange={open => !open && setChatToDelete(null)}
+      >
+        <DialogContent>
+          <DialogClose onClose={() => setChatToDelete(null)} />
+          <DialogHeader>
+            <DialogTitle>Delete Chat</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-gray-600">
+              Are you sure you want to delete this chat? This will permanently
+              delete all messages with{' '}
+              {chatToDelete &&
+                otherUserData.find(u => u.id === chatToDelete)?.full_name}
+              . This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setChatToDelete(null)}
+                disabled={isDeleting}
+                className="border-primary"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (!chatToDelete) return;
+                  const userToDelete = otherUserData.find(
+                    u => u.id === chatToDelete
+                  );
+                  if (userToDelete) {
+                    handleDeleteChat(chatToDelete, userToDelete.full_name);
+                  }
+                }}
+                disabled={isDeleting}
+                className="bg-red-500 hover:bg-red-600 text-white border-red-500"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
