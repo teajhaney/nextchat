@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useMessageStore } from '@/store/messageStore';
 import { useAuthStore } from '@/store/authStore';
 import { LoadingSpinner, ReadReceipt } from '@/components';
+import { RichTextMessage } from './richTextMessage';
 import { ChevronDown } from 'lucide-react';
 
 export const SingleChat = () => {
@@ -570,9 +571,10 @@ export const SingleChat = () => {
                   : 'rounded-tr-lg bg-gray100'
               }`}
             >
-              <p className="text-gray-800 break-words whitespace-pre-wrap">
-                {message.content}
-              </p>
+              <RichTextMessage
+                content={message.content}
+                className="text-gray-800 break-words whitespace-pre-wrap"
+              />
               <div className="flex gap-2 justify-between items-center">
                 <div className={`text-[8px] mt-1 text-primary`}>
                   {new Date(message.created_at).toLocaleTimeString([], {

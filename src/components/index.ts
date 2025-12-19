@@ -18,6 +18,7 @@ export { GroupChats } from './groupChats';
 export { ReadReceipt } from './readReceipt';
 export { AddUserDialog } from './addUserDialog';
 export { ProfileModal } from './profileModal';
+export { RichTextMessage } from './richTextMessage';
 
 //shadcn component
 export { Button } from './ui/button';
